@@ -1,0 +1,103 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import PageHead from '../components/site/PageHead.astro';
+import Portrait from '../components/site/Portrait.astro';
+import Photo from '../components/site/Photo.astro';
+import { photos } from '../data/photos';
+import { person, jobMarket } from '../data/program';
+import { bio, education, shortBio } from '../data/cv';
+---
+
+<SiteLayout
+  title="About"
+  description="Niloofar Rezaei is a Ph.D. candidate in Engineering at the University of Georgia who studies human-centered smart manufacturing."
+  profile
+>
+  <PageHead
+    label="About"
+    title={person.name}
+    sub={`Pronounced ${person.pronunciation}`}
+    lede={`${person.role}, ${person.unit}, ${person.university}`}
+  />
+
+  <section class="section section-tight" aria-label="Biography">
+    <div class="wrap split">
+      <div class="prose">
+        {bio.map((paragraph) => <p>{paragraph}</p>)}
+      </div>
+      <Portrait variant="card" />
+    </div>
+
+    <div class="wrap">
+      <aside class="aside about-facts" aria-labelledby="glance-heading">
+        <h2 class="section-label" id="glance-heading">At a glance</h2>
+        <dl class="glance is-strip">
+          <div>
+            <dt>Position</dt>
+            <dd>{person.role} ({person.emphasis})</dd>
+          </div>
+          <div>
+            <dt>Lab</dt>
+            <dd>
+              <a href={person.labUrl} rel="noopener">{person.lab}</a>, {person.university}
+            </dd>
+          </div>
+          <div>
+            <dt>Advisor</dt>
+            <dd>{person.advisor}</dd>
+          </div>
+          <div>
+            <dt>Defense</dt>
+            <dd>Expected Summer 2027</dd>
+          </div>
+          {
+            jobMarket.show && (
+              <div>
+                <dt>Seeking</dt>
+                <dd>A tenure-track assistant professor position starting Fall 2027</dd>
+              </div>
+            )
+          }
+          <div>
+            <dt>Email</dt>
+            <dd><a href={`mailto:${person.email}`}>{person.email}</a></dd>
+          </div>
+        </dl>
+      </aside>
+    </div>
+
+    <div class="wrap photo-pair">
+      <Photo photo={photos.namrc53} sizes="(min-width: 48rem) 36rem, 92vw" />
+      <Photo photo={photos.poster} sizes="(min-width: 48rem) 36rem, 92vw" />
+    </div>
+  </section>
+
+  <section class="section section-tight" aria-labelledby="education-heading">
+    <div class="wrap">
+      <h2 class="block-title" id="education-heading">Education</h2>
+      <ul class="timeline">
+        {
+          education.map((entry) => (
+            <li>
+              <p class="when">{entry.when}</p>
+              <div>
+                <h3 class="timeline-title">{entry.degree}</h3>
+                <p class="timeline-place">{entry.place}</p>
+                {entry.notes.map((note) => <p>{note}</p>)}
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="more"><a href="/cv">Full CV</a></p>
+    </div>
+  </section>
+
+  <section class="section section-tight" aria-labelledby="shortbio-heading">
+    <div class="wrap">
+      <h2 class="block-title" id="shortbio-heading">Short bio</h2>
+      <p class="block-note">For talk announcements and introductions. Click the text to select it.</p>
+      <p class="short-bio">{shortBio}</p>
+    </div>
+  </section>
+</SiteLayout>

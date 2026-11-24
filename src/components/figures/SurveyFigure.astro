@@ -1,0 +1,180 @@
+---
+/**
+ * ASME IDETC/CIE 2023: what the pecan industry named as its challenges, and which
+ * Industry 4.0 technologies the paper points at each one.
+ *
+ * Counts are the 15 bars of the paper's Figure 2. The links between challenges and
+ * technologies are the paths of the paper's Figure 4, read at high magnification.
+ * The drawing itself is new: bars on the left, technologies on the right, a curve for each link.
+ */
+import XFigure from './XFigure.astro';
+
+const id = 'fig-survey';
+
+const techs = [
+  {
+    key: 'iot',
+    name: 'IoT',
+    full: 'Internet of Things',
+    icon: 'M8 8h8v8H8zM12 3v2.5M12 18.5v2.5M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M18.4 5.6l-1.8 1.8M5.6 18.4l1.8-1.8',
+  },
+  {
+    key: 'ai',
+    name: 'AI',
+    full: 'Artificial intelligence',
+    icon: 'M12 9.5v5M9.9 11L7 8M14.1 11L17 8M9.9 13L7 16M14.1 13L17 16M12 9.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM6 5a2 2 0 100 4 2 2 0 000-4zM18 5a2 2 0 100 4 2 2 0 000-4zM6 15a2 2 0 100 4 2 2 0 000-4zM18 15a2 2 0 100 4 2 2 0 000-4z',
+  },
+  {
+    key: 'data',
+    name: 'Big data',
+    full: 'Big data analytics',
+    icon: 'M5 6.5C5 4.8 8.1 3.5 12 3.5s7 1.3 7 3S15.9 9.5 12 9.5 5 8.2 5 6.5zM5 6.5v5.5c0 1.7 3.1 3 7 3s7-1.3 7-3V6.5M5 12v5.5c0 1.7 3.1 3 7 3s7-1.3 7-3V12',
+  },
+  {
+    key: 'ras',
+    name: 'Robotics',
+    full: 'Robotics and autonomous systems',
+    icon: 'M4 20.5h11M7.5 20.5V15l5.5-6.5M13 8.5l4.5 2.5M13 8.5l1-4.5M14 4h3.5M17.5 11v3.5M15.5 14.5h4',
+  },
+  {
+    key: 'chain',
+    name: 'Blockchain',
+    full: 'Blockchain',
+    icon: 'M3 8.5h7v7H3zM14 8.5h7v7h-7zM10 12h4M6.5 4v4.5M17.5 15.5V20',
+  },
+];
+
+const challenges = [
+  { name: 'Moisture', count: 11, tech: ['iot'] },
+  { name: 'Food safety', count: 9, tech: ['iot'] },
+  { name: 'Half-yield', count: 9, tech: ['ai', 'data'] },
+  { name: 'Equipment price', count: 8, tech: [] },
+  { name: 'Marketing', count: 8, tech: ['chain'] },
+  { name: 'Cracking', count: 7, tech: ['ai', 'ras'] },
+  { name: 'Grades', count: 7, tech: ['data'] },
+  { name: 'Storage', count: 6, tech: ['iot', 'ai', 'data'] },
+  { name: 'Automation', count: 5, tech: ['ai', 'ras'] },
+  { name: 'Labor', count: 5, tech: ['ai', 'ras'] },
+  { name: 'Packaging', count: 5, tech: ['data', 'ras'] },
+  { name: 'Shelf-life', count: 5, tech: ['ai', 'data'] },
+  { name: 'Shelling', count: 5, tech: ['ai', 'ras'] },
+  { name: 'Equipment diversity', count: 3, tech: ['iot', 'ai', 'ras'] },
+  { name: 'Standards', count: 2, tech: ['chain'] },
+];
+
+const ROWS = challenges.length;
+const lower = (text: string) => text.charAt(0).toLowerCase() + text.slice(1);
+const list = (items: string[]) =>
+  items.length > 1 ? `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}` : items[0];
+const namesFor = (key: string) => challenges.filter((c) => c.tech.includes(key)).map((c) => lower(c.name));
+/** Choice 1 is "All". Choices 2 to 6 are the technologies, in order. */
+const activeFor = (tech: string[]) => ['1', ...techs.flatMap((t, i) => (tech.includes(t.key) ? [String(i + 2)] : []))].join(' ');
+
+// One curve for each link, from a challenge's row to its technology.
+const links = challenges.flatMap((challenge, row) =>
+  challenge.tech.map((key) => {
+    const t = techs.findIndex((tech) => tech.key === key);
+    const y0 = row + 0.5;
+    const y1 = (t + 0.5) * (ROWS / techs.length);
+    return { key, choice: t + 2, d: `M0 ${y0}C46 ${y0} 54 ${y1.toFixed(2)} 100 ${y1.toFixed(2)}` };
+  }),
+);
+---
+
+<XFigure
+  id={id}
+  no={5}
+  title="What the pecan industry said it needs"
+  hint="Pick a technology to see which challenges the paper points it at."
+>
+  <input class="xin xin-a" type="radio" name={`${id}-a`} id={`${id}-a1`} value="1" checked />
+  {techs.map((_, i) => <input class="xin xin-a" type="radio" name={`${id}-a`} id={`${id}-a${i + 2}`} value={i + 2} />)}
+
+  <div class="xrow srv-controls">
+    <div class="xseg srv-pills">
+      <label class="xpick" for={`${id}-a1`} data-pick-a="1">All challenges</label>
+      {
+        techs.map((tech, i) => (
+          <label class="xpick srv-pill-tech" for={`${id}-a${i + 2}`} data-pick-a={i + 2}>
+            {tech.name}
+          </label>
+        ))
+      }
+    </div>
+    <p class="srv-context">
+      53 industry members, at a Georgia pecan growers’ conference in March 2022. Each listed up to five challenges for
+      the next five years: 113 answers in all.
+    </p>
+  </div>
+
+  <div class="xfig-stage srv">
+    <div class="xcard srv-board">
+      <div class="srv-head">
+        <span>The 15 challenges named most often</span>
+        <span class="srv-head-mid" aria-hidden="true"></span>
+        <span class="srv-head-tech">Technology the paper points at it</span>
+      </div>
+      <div class="srv-flow">
+        <ol class="srv-bars">
+          {
+            challenges.map((challenge) => (
+              <li class="srv-row" data-a={activeFor(challenge.tech)}>
+                <span class="srv-name">{challenge.name}</span>
+                <span class="srv-track">
+                  <i style={`--n:${challenge.count}`} />
+                  <b>{challenge.count}</b>
+                  {challenge.tech.length === 0 && <em>outside Industry 4.0</em>}
+                </span>
+              </li>
+            ))
+          }
+        </ol>
+
+        <svg class="srv-links" viewBox={`0 0 100 ${ROWS}`} preserveAspectRatio="none" aria-hidden="true" focusable="false">
+          {links.map((link) => <path class:list={['srv-link', `is-${link.key}`]} data-a={`1 ${link.choice}`} d={link.d} />)}
+        </svg>
+
+        <div class="srv-techs">
+          {
+            techs.map((tech, i) => (
+              <label class:list={['srv-tech', `is-${tech.key}`, i === 0 && 'xnudge']} for={`${id}-a${i + 2}`} data-pick-a={i + 2}>
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d={tech.icon} />
+                </svg>
+                <span>
+                  <b>{tech.full}</b>
+                  <span>{namesFor(tech.key).length} of 15 challenges</span>
+                </span>
+              </label>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="xcard xpanes srv-panes" aria-live="polite">
+      <div class="xpane" data-a="1">
+        <p class="xlabel">All 15 challenges</p>
+        <p class="srv-say">
+          The paper puts its emphasis on three: moisture, cracking and shelling equipment, and post-processing. Equipment
+          price is the one challenge it places outside Industry 4.0.
+        </p>
+      </div>
+      {
+        techs.map((tech, i) => (
+          <div class="xpane" data-a={i + 2}>
+            <p class="xlabel">{tech.full}</p>
+            <p class="srv-say">
+              The paper points {namesFor(tech.key).length} of the 15 challenges this way: {list(namesFor(tech.key))}.
+            </p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+
+  <Fragment slot="caption">
+    Drawn for this site from the counts and solution paths reported in Smith, Bowen, Rezaei, Mozaffar, Rahmanpour,
+    Das &amp; Morkos (2023), ASME IDETC/CIE. A bar shows how many times a challenge was named.
+  </Fragment>
+</XFigure>

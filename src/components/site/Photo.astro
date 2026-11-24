@@ -1,0 +1,20 @@
+---
+import { Image } from 'astro:assets';
+import type { SitePhoto } from '../../data/photos';
+
+interface Props {
+  photo: SitePhoto;
+  /** How wide the photo is shown, so browsers pick a suitable file size. */
+  sizes?: string;
+}
+
+const { photo, sizes = '(min-width: 56rem) 32rem, 92vw' } = Astro.props;
+---
+
+<figure class="photo">
+  <Image src={photo.src} alt={photo.alt} widths={[480, 720, 960, 1280]} sizes={sizes} />
+  <figcaption>
+    <span>{photo.caption}</span>
+    {photo.credit && <span class="credit">{photo.credit}</span>}
+  </figcaption>
+</figure>

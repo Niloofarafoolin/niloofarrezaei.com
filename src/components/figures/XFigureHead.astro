@@ -1,0 +1,23 @@
+---
+/** The numbered heading of an interactive figure: "Fig. N", the Interactive tag, a title and a prompt. */
+interface Props {
+  id: string;
+  no: number;
+  title: string;
+  hint: string;
+}
+
+const { id, no, title, hint } = Astro.props;
+---
+
+<p class="xfig-kicker">
+  <span class="xfig-no">Fig. {no}</span>
+  <span class="xfig-tag">
+    <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+      <path d="M5 2.5v8.2l2.2-1.9 1.7 3.9 1.6-.7-1.7-3.8 2.9-.2z"></path>
+    </svg>
+    Interactive
+  </span>
+</p>
+<p class="xfig-title" id={`${id}-title`}>{title}</p>
+<p class="xfig-hint">{hint}</p>

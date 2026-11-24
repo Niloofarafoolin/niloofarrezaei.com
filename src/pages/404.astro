@@ -1,0 +1,24 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import PageHead from '../components/site/PageHead.astro';
+import { nav } from '../data/program';
+---
+
+<SiteLayout title="Page not found" description="This page does not exist." unlisted>
+  <PageHead label="Error 404" title="This page does not exist." lede="The address may be mistyped, or the page may have moved." />
+
+  <section class="section section-tight" aria-label="Where to go next">
+    <div class="wrap">
+      <ul class="plain-list">
+        <li><a href="/">Home</a></li>
+        {
+          nav.map((item) => (
+            <li>
+              <a href={item.href}>{item.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</SiteLayout>

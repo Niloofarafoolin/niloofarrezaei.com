@@ -1,0 +1,218 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import PageHead from '../components/site/PageHead.astro';
+import StatusLabel from '../components/site/StatusLabel.astro';
+import Photo from '../components/site/Photo.astro';
+import SessionFigure from '../components/figures/SessionFigure.astro';
+import VisionFigure from '../components/figures/VisionFigure.astro';
+import LayersFigure from '../components/figures/LayersFigure.astro';
+import SurveyFigure from '../components/figures/SurveyFigure.astro';
+import SegmentFigure from '../components/figures/SegmentFigure.astro';
+import FigureThumb from '../components/figures/FigureThumb.astro';
+import QuestionArt from '../components/site/QuestionArt.astro';
+import '../styles/figures.css';
+import { agenda, thrusts, fiveYearPlan } from '../data/program';
+import { projects } from '../data/projects';
+---
+
+<SiteLayout
+  title="Research"
+  description="Manufacturing Empathy: making an operator's cognitive load and fatigue observable and actionable in advanced manufacturing."
+>
+  <PageHead label="Research" title={agenda.title} lede={agenda.subtitle} />
+
+  <section class="section section-tight" aria-labelledby="problem-heading">
+    <div class="wrap split">
+      <div class="prose">
+        <h2 class="block-title" id="problem-heading">The problem and the goal</h2>
+        {agenda.overview.map((paragraph) => <p>{paragraph}</p>)}
+      </div>
+      <aside class="aside" aria-labelledby="gaps-heading">
+        <h3 class="section-label" id="gaps-heading">Three gaps to close</h3>
+        <ol class="gaps">
+          {agenda.gaps.map((gap) => <li>{gap}</li>)}
+        </ol>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section section-tight" aria-labelledby="work-heading">
+    <div class="wrap">
+      <p class="section-label">Completed and ongoing work</p>
+      <h2 class="section-title" id="work-heading">What I have shown so far</h2>
+      <p class="section-intro">Each project opens with a figure you can try. Pick one to jump to it.</p>
+
+      <ol class="fig-index">
+        {
+          projects
+            .filter((project) => project.figure)
+            .map((project, index) => (
+              <li>
+                <FigureThumb figure={`fig-${project.figure}`} />
+                <span class="fig-index-no">{String(index + 1).padStart(2, '0')}</span>
+                <span class="fig-index-name">{project.short}</span>
+              </li>
+            ))
+        }
+      </ol>
+
+      <div class="projects">
+        {
+          projects.map((project, index) => (
+            <article class="project" id={project.id} aria-labelledby={`${project.id}-title`}>
+              <header class="project-head">
+                <div>
+                  <p class="project-kicker">Project {String(index + 1).padStart(2, '0')}</p>
+                  <h3 class="project-title" id={`${project.id}-title`}>
+                    {project.title}
+                  </h3>
+                </div>
+                <p class="project-where">
+                  <StatusLabel status={project.status} />
+                  <span>{project.where}</span>
+                </p>
+              </header>
+              {project.figure === 'session' && <SessionFigure />}
+              {project.figure === 'vision' && <VisionFigure />}
+              {project.figure === 'layers' && <LayersFigure />}
+              {project.figure === 'survey' && <SurveyFigure />}
+              {project.figure === 'segment' && <SegmentFigure />}
+              <div class:list={['project-body', { 'has-photo': project.photos && project.photos.length > 0 }]}>
+              <dl class="schema">
+                <div>
+                  <dt>Question</dt>
+                  <dd>{project.question}</dd>
+                </div>
+                <div>
+                  <dt>My contribution</dt>
+                  <dd>{project.contribution}</dd>
+                </div>
+                {
+                  project.system && (
+                    <div>
+                      <dt>System</dt>
+                      <dd>{project.system}</dd>
+                    </div>
+                  )
+                }
+                <div>
+                  <dt>{project.status === 'ongoing' ? 'Status' : 'Result'}</dt>
+                  <dd>{project.result}</dd>
+                </div>
+                {
+                  project.next && (
+                    <div>
+                      <dt>Next question</dt>
+                      <dd>{project.next}</dd>
+                    </div>
+                  )
+                }
+                {
+                  project.carries && (
+                    <div>
+                      <dt>What carries over</dt>
+                      <dd>{project.carries}</dd>
+                    </div>
+                  )
+                }
+                <div>
+                  <dt>Artifacts</dt>
+                  <dd>
+                    <ul class="artifacts">
+                      {
+                        project.artifacts.map((artifact) => (
+                          <li>
+                            {artifact.href ? (
+                              <a href={artifact.href} rel="noopener">
+                                {artifact.label}
+                              </a>
+                            ) : (
+                              artifact.label
+                            )}
+                          </li>
+                        ))
+                      }
+                    </ul>
+                  </dd>
+                </div>
+              </dl>
+              {
+                project.photos && project.photos.length > 0 && (
+                  <div class="project-photos">
+                    {project.photos.map((photo) => (
+                      <Photo photo={photo} sizes="(min-width: 64rem) 22rem, 88vw" />
+                    ))}
+                  </div>
+                )
+              }
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-tight" aria-labelledby="agenda-heading">
+    <div class="wrap">
+      <p class="section-label">Faculty research agenda</p>
+      <h2 class="section-title" id="agenda-heading">Where this goes next</h2>
+      <p class="section-intro">Three thrusts, each framed by the question it answers. All three are research directions, not results.</p>
+
+      <ol class="questions has-art">
+        {
+          thrusts.map((thrust, i) => (
+            <li>
+              <span class="q-no" aria-hidden="true">
+                {thrust.number}
+              </span>
+              <div class="q-body">
+                <h3 class="q-text">{thrust.question}</h3>
+                <p class="q-thrust">{thrust.title}</p>
+                <p class="q-approach">{thrust.approach}</p>
+                <p class="q-first">
+                  <span class="tag">First project</span>
+                  <span>{thrust.firstProject}</span>
+                </p>
+              </div>
+              <div class="q-side">
+                <div class="q-art">
+                  <QuestionArt n={(i + 1) as 1 | 2 | 3} />
+                </div>
+                <StatusLabel status={thrust.status} />
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="band is-dark" aria-labelledby="plan-heading">
+    <div class="wrap">
+      <h2 class="section-label" id="plan-heading">Five-year plan</h2>
+      <div class="duo">
+        {
+          fiveYearPlan.phases.map((phase) => (
+            <div>
+              <h3 class="duo-lead">{phase.period}</h3>
+              <ul class="plain-list">
+                {phase.items.map((item) => <li>{item}</li>)}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+      <p class="plan-fit">{fiveYearPlan.fit}</p>
+    </div>
+  </section>
+
+  <section class="section section-tight" aria-labelledby="sources-heading">
+    <div class="wrap">
+      <h2 class="section-label" id="sources-heading">Sources cited on this page</h2>
+      <ul class="sources">
+        {agenda.sources.map((source) => <li>{source}</li>)}
+      </ul>
+    </div>
+  </section>
+</SiteLayout>

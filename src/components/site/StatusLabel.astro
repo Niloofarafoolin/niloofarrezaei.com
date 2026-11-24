@@ -1,0 +1,42 @@
+---
+import { statusLabel, type Status } from '../../data/program';
+
+interface Props {
+  status: Status;
+  /** Show only the glyph on narrow layouts. The text stays available to screen readers. */
+  compact?: boolean;
+}
+
+const { status, compact = false } = Astro.props;
+---
+
+<span class:list={['status', `status-${status}`, compact && 'is-compact']}>
+  <svg class="status-glyph" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" focusable="false">
+    {status === 'published' && <circle cx="6" cy="6" r="5" fill="currentColor" />}
+    {
+      status === 'in-review' && (
+        <circle cx="6" cy="6" r="4.25" fill="none" stroke="currentColor" stroke-width="1.5" />
+      )
+    }
+    {status === 'in-review' && <path d="M6 1.75a4.25 4.25 0 0 0 0 8.5z" fill="currentColor" />}
+    {
+      status === 'ongoing' && (
+        <circle
+          cx="6"
+          cy="6"
+          r="4.25"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-dasharray="2.3 1.7"
+        />
+      )
+    }
+    {
+      status === 'direction' && (
+        <circle cx="6" cy="6" r="4.25" fill="none" stroke="currentColor" stroke-width="1.5" />
+      )
+    }
+  </svg>
+  <span class="status-text">{statusLabel[status]}</span>
+</span>

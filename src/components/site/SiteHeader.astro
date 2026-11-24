@@ -1,0 +1,42 @@
+---
+import { nav, person } from '../../data/program';
+
+interface Props {
+  /** On the home page the name is the page's main heading. */
+  isHome?: boolean;
+}
+
+const { isHome = false } = Astro.props;
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+---
+
+<header class="site-header">
+  <div class="wrap header-row">
+    {
+      isHome ? (
+        <h1 class="wordmark">
+          <a href="/" aria-current="page">
+            {person.name}
+          </a>
+        </h1>
+      ) : (
+        <p class="wordmark">
+          <a href="/">{person.name}</a>
+        </p>
+      )
+    }
+    <nav class="site-nav" aria-label="Primary">
+      <ul>
+        {
+          nav.map((item) => (
+            <li>
+              <a href={item.href} aria-current={path === item.href ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</header>

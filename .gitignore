@@ -1,0 +1,39 @@
+# build output
+dist/
+# generated types
+.astro/
+
+# dependencies
+node_modules/
+.tooling/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# environment variables
+.env
+.env.production
+
+# macOS-specific files
+.DS_Store
+
+# python
+__pycache__/
+*.pyc
+
+# jetbrains setting folder
+.idea/
+
+# local CV PDF (optional; keep the placeholder folder)
+public/cv/*.pdf
+!public/cv/.gitkeep
+
+# the owner's private details and notes: never commit (see scripts/private-rules.mjs)
+/private/
+
+# local preview configuration and editor files
+.claude/
+.vscode/

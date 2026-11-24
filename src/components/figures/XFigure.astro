@@ -1,0 +1,39 @@
+---
+/**
+ * The frame every interactive figure shares: a numbered heading, a one-line prompt,
+ * the figure itself, and a caption.
+ * The radio buttons that drive a figure must be the first things placed inside this frame.
+ * See src/styles/figures.css for how the choices switch parts of a figure on.
+ */
+import XFigureHead from './XFigureHead.astro';
+
+interface Props {
+  /** Also the anchor other pages link to, such as /research#fig-session. */
+  id: string;
+  /** The figure's number on its page. */
+  no: number;
+  title: string;
+  /** What the visitor can do, in one short sentence. */
+  hint: string;
+  /** The figure places its own heading (with XFigureHead), for example beside its controls. */
+  headless?: boolean;
+}
+
+const { id, no, title, hint, headless = false } = Astro.props;
+---
+
+<figure class:list={['xfig', id, headless && 'is-headless']} id={id} aria-labelledby={`${id}-title`}>
+  {
+    !headless && (
+      <div class="xfig-head">
+        <XFigureHead id={id} no={no} title={title} hint={hint} />
+      </div>
+    )
+  }
+  <div class="xfig-body" role="group" aria-label={title}>
+    <slot />
+  </div>
+  <figcaption class="xfig-cap">
+    <slot name="caption" />
+  </figcaption>
+</figure>

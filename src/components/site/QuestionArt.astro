@@ -1,0 +1,143 @@
+---
+/**
+ * A small drawing for each of the three research questions.
+ * They picture the idea of each question. They are not results, and each card says "Research direction".
+ */
+import { MAT, makeIso, operator } from '../../lib/iso';
+
+interface Props {
+  n: 1 | 2 | 3;
+}
+
+const { n } = Astro.props;
+const f1 = (v: number) => v.toFixed(1);
+
+// ---------- 1: three signals become one estimate, with a band of uncertainty ----------
+
+const wave = (y: number, amp: number, k: number) =>
+  Array.from({ length: 35 }, (_, i) => {
+    const x = 16 + i * 4;
+    return `${i === 0 ? 'M' : 'L'}${x} ${f1(y + amp * Math.sin(i * k) + amp * 0.4 * Math.sin(i * k * 2.7))}`;
+  }).join('');
+const ticks = Array.from({ length: 12 }, (_, i) => `M${18 + i * 12} 158V${f1(146 - (i % 3) * 3)}`).join('');
+// The estimate rises from the node; its band is wide at first and narrows.
+const estPts = Array.from({ length: 32 }, (_, i) => {
+  const t = i / 31;
+  const x = 190 + t * 154;
+  const y = 105 - 38 * (t * t * (3 - 2 * t));
+  const half = 7 + 21 * Math.exp(-t * 3.2);
+  return { x, y, half };
+});
+const estLine = estPts.map((p, i) => `${i === 0 ? 'M' : 'L'}${f1(p.x)} ${f1(p.y)}`).join('');
+const estBand =
+  estPts.map((p, i) => `${i === 0 ? 'M' : 'L'}${f1(p.x)} ${f1(p.y - p.half)}`).join('') +
+  estPts
+    .slice()
+    .reverse()
+    .map((p) => `L${f1(p.x)} ${f1(p.y + p.half)}`)
+    .join('') +
+  'Z';
+
+// ---------- 2: an operator and a robot share a bench; a task moves across ----------
+
+function cell() {
+  const { xy, P, box, shadow } = makeIso(0.4, 0.32, 180);
+  let s = box(10, -22, -8, 300, 112, 8, MAT.floor);
+  s += shadow(118, 20, 136, 42);
+  s += box(122, 54, 0, 5, 5, 58, MAT.frame) + box(245, 54, 0, 5, 5, 58, MAT.frame);
+  s += box(122, 22, 0, 5, 5, 58, MAT.frame) + box(245, 22, 0, 5, 5, 58, MAT.frame);
+  s += box(118, 20, 58, 136, 42, 6, MAT.bench);
+  s += box(136, 28, 64, 12, 12, 9, MAT.part) + box(151, 28, 64, 12, 12, 14, MAT.part) + box(140, 44, 64, 14, 10, 8, MAT.green);
+  // The robot: a base, a column and a two-part arm.
+  s += shadow(266, 28, 30, 30);
+  s += box(268, 30, 0, 28, 28, 18, MAT.dark);
+  s += box(277, 39, 18, 10, 10, 50, MAT.steel);
+  const [sx, sy] = xy(282, 44, 72);
+  const elbow = [sx - 30, sy - 40];
+  const wrist = [sx - 70, sy - 14];
+  const arm = `M${f1(sx)} ${f1(sy)}L${f1(elbow[0])} ${f1(elbow[1])}L${f1(wrist[0])} ${f1(wrist[1])}`;
+  s += `<path d="${arm}" fill="none" stroke="#17130f" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>`;
+  s += `<path d="${arm}" fill="none" stroke="#bcc7c0" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>`;
+  for (const [cx, cy] of [[sx, sy], elbow, wrist]) {
+    s += `<circle cx="${f1(cx)}" cy="${f1(cy)}" r="6" fill="#17130f"/><circle cx="${f1(cx)}" cy="${f1(cy)}" r="2.6" fill="#f4b58a"/>`;
+  }
+  // The gripper, holding a part above the bench.
+  const [wx, wy] = wrist;
+  s += `<path d="M${f1(wx - 7)} ${f1(wy + 6)}v9M${f1(wx + 7)} ${f1(wy + 6)}v9M${f1(wx - 7)} ${f1(wy + 6)}h14" fill="none" stroke="#17130f" stroke-width="3" stroke-linecap="round"/>`;
+  s += `<rect x="${f1(wx - 5)}" y="${f1(wy + 10)}" width="10" height="9" rx="1.5" fill="#8d3514" stroke="rgba(22,19,16,.4)" stroke-width=".7"/>`;
+  // The task moves from the operator's side to the robot's.
+  s += `<path d="M${P(158, 28, 84)}C${f1(wx - 52)} ${f1(wy - 30)} ${f1(wx - 26)} ${f1(wy - 30)} ${f1(wx - 12)} ${f1(wy - 2)}" fill="none" stroke="#8d3514" stroke-width="2" stroke-dasharray="4 4" stroke-linecap="round"/>`;
+  s += `<path d="M${f1(wx - 20)} ${f1(wy - 8)}L${f1(wx - 11)} ${f1(wy - 1)}L${f1(wx - 9)} ${f1(wy - 13)}" fill="none" stroke="#8d3514" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const [ox, oy] = xy(94, 12, 0);
+  s += operator(ox, oy, 0.8);
+  // Rising strain, above the operator.
+  s += `<g transform="translate(${f1(ox - 34)} ${f1(oy - 150)})"><rect width="44" height="30" rx="7" fill="#17130f"/><path d="M9 22v-5M17 22v-8M25 22v-12M33 22v-16" stroke="#f4b58a" stroke-width="4" stroke-linecap="round"/></g>`;
+  return s;
+}
+
+// ---------- 3: what the station records stays inside it; only indicators leave ----------
+
+function boundary() {
+  const { xy, box, shadow } = makeIso(0.4, 0.32, 178);
+  let s = box(22, -18, -8, 196, 104, 8, MAT.floor);
+  s += shadow(36, 62, 10, 10);
+  s += box(38, 64, 0, 5, 5, 108, MAT.frame);
+  s += box(28, 61, 108, 28, 11, 14, MAT.dark);
+  s += box(56, 63, 111, 7, 7, 8, MAT.green);
+  const [lx, ly] = xy(63, 66, 115);
+  s += `<path d="M${f1(lx)} ${f1(ly)}L${f1(lx + 46)} ${f1(ly + 34)}L${f1(lx + 14)} ${f1(ly + 104)}Z" fill="#4d7a69" opacity=".2"/>`;
+  s += shadow(120, 22, 84, 38);
+  s += box(124, 52, 0, 5, 5, 54, MAT.frame) + box(195, 52, 0, 5, 5, 54, MAT.frame);
+  s += box(124, 24, 0, 5, 5, 54, MAT.frame) + box(195, 24, 0, 5, 5, 54, MAT.frame);
+  s += box(120, 22, 54, 84, 38, 6, MAT.bench);
+  s += box(132, 44, 60, 22, 10, 10, MAT.copper) + box(160, 30, 60, 12, 12, 10, MAT.part) + box(176, 30, 60, 12, 12, 6, MAT.green);
+  const [ox, oy] = xy(100, 14, 0);
+  s += operator(ox, oy, 0.74);
+  return s;
+}
+
+const labels = {
+  1: 'Three signals merge into one estimate. Its band of uncertainty is wide at first and narrows.',
+  2: 'An operator and a robot arm share a bench. A task moves from the operator to the robot.',
+  3: 'A station inside a dashed line with a lock. Only three small dots leave it, towards a screen.',
+};
+---
+
+<svg class="qart" viewBox="0 0 360 210" role="img" aria-label={labels[n]} focusable="false">
+  {
+    n === 1 && (
+      <>
+        <path d="M12 46H348M12 86H348M12 126H348M12 166H348" stroke="rgba(22,19,16,.1)" stroke-dasharray="2 5" />
+        <path d={wave(58, 7, 0.55)} fill="none" stroke="#b0522a" stroke-width="2" stroke-linejoin="round" />
+        <path d={wave(104, 5, 0.8)} fill="none" stroke="#4d7a69" stroke-width="2" stroke-linejoin="round" />
+        <path d={ticks} fill="none" stroke="#161310" stroke-width="2" stroke-linecap="round" />
+        <path d="M152 58C170 58 160 100 178 102M152 104H164M152 152C170 152 160 110 178 108" fill="none" stroke="rgba(22,19,16,.45)" stroke-width="1.6" stroke-dasharray="3 4" />
+        <path d={estBand} fill="#8d3514" opacity=".2" />
+        <path d="M190 74H346" stroke="#161310" stroke-width="1.2" stroke-dasharray="5 5" opacity=".55" />
+        <path d={estLine} fill="none" stroke="#8d3514" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+        <circle cx="177" cy="105" r="14" fill="#fffdf9" stroke="#161310" stroke-width="2" />
+        <circle cx="177" cy="105" r="5" fill="#8d3514" />
+        <circle cx="344" cy="67" r="6" fill="#8d3514" stroke="#fffdf9" stroke-width="2.4" />
+      </>
+    )
+  }
+  {n === 2 && <Fragment set:html={cell()} />}
+  {
+    n === 3 && (
+      <>
+        <rect x="10" y="20" width="236" height="178" rx="16" fill="rgba(141,53,20,.05)" stroke="#8d3514" stroke-width="1.6" stroke-dasharray="6 5" />
+        <Fragment set:html={boundary()} />
+        <circle cx="34" cy="20" r="13" fill="#f3ebdd" stroke="#8d3514" stroke-width="1.4" />
+        <path d="M29.5 19v-2.6a4.5 4.5 0 019 0V19M28 19h12v8.5H28z" fill="none" stroke="#8d3514" stroke-width="1.5" stroke-linejoin="round" />
+        <path d="M246 112H296" stroke="#161310" stroke-width="1.6" stroke-dasharray="2 5" stroke-linecap="round" />
+        <path d="M290 106l8 6-8 6" fill="none" stroke="#161310" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        <circle cx="258" cy="112" r="4" fill="#b0522a" />
+        <circle cx="270" cy="112" r="4" fill="#4d7a69" />
+        <circle cx="282" cy="112" r="4" fill="#161310" />
+        <rect x="304" y="72" width="46" height="80" rx="8" fill="#17130f" />
+        <path d="M313 136v-12M322 136v-22M331 136v-16M340 136v-30" stroke="#a4dbc5" stroke-width="4" stroke-linecap="round" />
+        <path d="M312 92h30M312 100h18" stroke="rgba(239,230,216,.6)" stroke-width="2.4" stroke-linecap="round" />
+      </>
+    )
+  }
+</svg>

@@ -1,0 +1,103 @@
+---
+import '@fontsource-variable/fraunces/opsz.css';
+import '@fontsource-variable/fraunces/opsz-italic.css';
+import textFont from '@fontsource-variable/source-sans-3/files/source-sans-3-latin-wght-normal.woff2?url';
+import displayFont from '@fontsource-variable/fraunces/files/fraunces-latin-opsz-normal.woff2?url';
+import displayItalicFont from '@fontsource-variable/fraunces/files/fraunces-latin-opsz-italic.woff2?url';
+import '../styles/site.css';
+import '../styles/pages.css';
+import SiteHeader from '../components/site/SiteHeader.astro';
+import SiteFooter from '../components/site/SiteFooter.astro';
+import { person, thesis } from '../data/program';
+
+interface Props {
+  title: string;
+  description: string;
+  isHome?: boolean;
+  /** Pages that are about the person carry structured data that search engines can read. */
+  profile?: boolean;
+  /** Keeps a page out of search results. Used by the "page not found" page only. */
+  unlisted?: boolean;
+}
+
+const { title, description, isHome = false, profile = false, unlisted = false } = Astro.props;
+const fullTitle = isHome ? title : `${title} · ${person.name}`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const cardImage = new URL('/og.png', Astro.site);
+const cardAlt = `${person.name}. ${thesis.statement} ${thesis.turn}`;
+
+const profileData = profile
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'ProfilePage',
+      mainEntity: {
+        '@type': 'Person',
+        name: person.name,
+        jobTitle: person.role,
+        description: `${thesis.statement} ${thesis.turn}`,
+        url: new URL('/', Astro.site).href,
+        email: `mailto:${person.email}`,
+        image: cardImage.href,
+        affiliation: [
+          { '@type': 'CollegeOrUniversity', name: person.university, url: 'https://www.uga.edu/' },
+          { '@type': 'ResearchOrganization', name: person.lab, url: person.labUrl },
+        ],
+        workLocation: { '@type': 'Place', name: 'Athens, Georgia, United States' },
+        alumniOf: [
+          { '@type': 'CollegeOrUniversity', name: 'Tarbiat Modares University' },
+          { '@type': 'CollegeOrUniversity', name: 'Islamic Azad University, Arak Branch' },
+        ],
+        knowsAbout: [
+          'Human-centered smart manufacturing',
+          'Operator cognitive load and fatigue',
+          'Multimodal sensing',
+          'Production systems modeling',
+          'Human-robot collaboration',
+        ],
+        sameAs: [person.scholar, person.linkedin],
+      },
+    }
+  : null;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- The site has one look, a light one. This stops phones from recolouring it in their dark mode. -->
+    <meta name="color-scheme" content="only light" />
+    <meta name="theme-color" content="#efe6d8" />
+    {unlisted && <meta name="robots" content="noindex" />}
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <!-- Fonts are served from this site, never from another server. The ones used at the top of the page load first. -->
+    <link rel="preload" href={textFont} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={displayFont} as="font" type="font/woff2" crossorigin />
+    {isHome && <link rel="preload" href={displayItalicFont} as="font" type="font/woff2" crossorigin />}
+    <title>{fullTitle}</title>
+
+    <!-- Link preview shown when the address is shared in email, Slack, LinkedIn or messages. -->
+    <meta property="og:type" content={profile ? 'profile' : 'website'} />
+    <meta property="og:site_name" content={person.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={cardImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={cardAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    {profileData && <script type="application/ld+json" set:html={JSON.stringify(profileData)} />}
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <SiteHeader isHome={isHome} />
+    <main id="main">
+      <slot />
+    </main>
+    <SiteFooter />
+  </body>
+</html>

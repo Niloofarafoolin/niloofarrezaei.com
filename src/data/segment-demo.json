@@ -1,0 +1,203 @@
+{
+  "size": 360,
+  "pictures": [
+    {
+      "key": "skin",
+      "name": "Pale patch on skin",
+      "note": "A pale patch with a soft edge, a blue ink mark and a patch of glare.",
+      "views": [
+        {
+          "name": "Full colour",
+          "file": "skin-view-1"
+        },
+        {
+          "name": "Red",
+          "file": "skin-view-2"
+        },
+        {
+          "name": "Lightness",
+          "file": "skin-view-3"
+        },
+        {
+          "name": "Saturation",
+          "file": "skin-view-4"
+        }
+      ],
+      "first": [
+        {
+          "name": "Full colour",
+          "file": "skin-first-1",
+          "match": 99
+        },
+        {
+          "name": "Red",
+          "file": "skin-first-2",
+          "match": 0
+        },
+        {
+          "name": "Lightness",
+          "file": "skin-first-3",
+          "match": 89
+        },
+        {
+          "name": "Saturation",
+          "file": "skin-first-4",
+          "match": 98
+        }
+      ],
+      "second": [
+        {
+          "name": "Adaptive threshold",
+          "file": "skin-second-1",
+          "match": 99
+        },
+        {
+          "name": "K-means",
+          "file": "skin-second-2",
+          "match": 98
+        },
+        {
+          "name": "Region growing",
+          "file": "skin-second-3",
+          "match": 92
+        }
+      ],
+      "final": {
+        "file": "skin-final",
+        "match": 99
+      }
+    },
+    {
+      "key": "metal",
+      "name": "Rust on brushed metal",
+      "note": "A rust spot on brushed metal that darkens towards the corners.",
+      "views": [
+        {
+          "name": "Full colour",
+          "file": "metal-view-1"
+        },
+        {
+          "name": "Red",
+          "file": "metal-view-2"
+        },
+        {
+          "name": "Lightness",
+          "file": "metal-view-3"
+        },
+        {
+          "name": "Saturation",
+          "file": "metal-view-4"
+        }
+      ],
+      "first": [
+        {
+          "name": "Full colour",
+          "file": "metal-first-1",
+          "match": 99
+        },
+        {
+          "name": "Red",
+          "file": "metal-first-2",
+          "match": 0
+        },
+        {
+          "name": "Lightness",
+          "file": "metal-first-3",
+          "match": 78
+        },
+        {
+          "name": "Saturation",
+          "file": "metal-first-4",
+          "match": 99
+        }
+      ],
+      "second": [
+        {
+          "name": "Adaptive threshold",
+          "file": "metal-second-1",
+          "match": 79
+        },
+        {
+          "name": "K-means",
+          "file": "metal-second-2",
+          "match": 99
+        },
+        {
+          "name": "Region growing",
+          "file": "metal-second-3",
+          "match": 92
+        }
+      ],
+      "final": {
+        "file": "metal-final",
+        "match": 98
+      }
+    },
+    {
+      "key": "bench",
+      "name": "Part on a bench",
+      "note": "A red part on a wooden bench, with its shadow and a strip of yellow tape.",
+      "views": [
+        {
+          "name": "Full colour",
+          "file": "bench-view-1"
+        },
+        {
+          "name": "Red",
+          "file": "bench-view-2"
+        },
+        {
+          "name": "Lightness",
+          "file": "bench-view-3"
+        },
+        {
+          "name": "Saturation",
+          "file": "bench-view-4"
+        }
+      ],
+      "first": [
+        {
+          "name": "Full colour",
+          "file": "bench-first-1",
+          "match": 98
+        },
+        {
+          "name": "Red",
+          "file": "bench-first-2",
+          "match": 75
+        },
+        {
+          "name": "Lightness",
+          "file": "bench-first-3",
+          "match": 96
+        },
+        {
+          "name": "Saturation",
+          "file": "bench-first-4",
+          "match": 87
+        }
+      ],
+      "second": [
+        {
+          "name": "Adaptive threshold",
+          "file": "bench-second-1",
+          "match": 97
+        },
+        {
+          "name": "K-means",
+          "file": "bench-second-2",
+          "match": 96
+        },
+        {
+          "name": "Region growing",
+          "file": "bench-second-3",
+          "match": 96
+        }
+      ],
+      "final": {
+        "file": "bench-final",
+        "match": 96
+      }
+    }
+  ]
+}

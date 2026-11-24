@@ -1,0 +1,21 @@
+---
+interface Props {
+  label: string;
+  title: string;
+  lede?: string;
+  /** A short line directly under the title, such as how to say a name. */
+  sub?: string;
+}
+
+const { label, title, lede, sub } = Astro.props;
+---
+
+<header class="page-head">
+  <div class="wrap">
+    <p class="section-label">{label}</p>
+    <h1 class="page-title">{title}</h1>
+    {sub && <p class="page-sub">{sub}</p>}
+    {lede && <p class="page-lede">{lede}</p>}
+    <slot />
+  </div>
+</header>

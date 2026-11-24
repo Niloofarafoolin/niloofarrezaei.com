@@ -1,0 +1,109 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import PageHead from '../components/site/PageHead.astro';
+import TeachingArt from '../components/site/TeachingArt.astro';
+import { teaching } from '../data/teaching';
+---
+
+<SiteLayout
+  title="Teaching and mentoring"
+  description="How Niloofar Rezaei teaches engineering systems: classroom experience, courses ready to teach, and a record of mentoring 25 students."
+>
+  <PageHead label="Teaching and mentoring" title={teaching.title}>
+    <TeachingArt />
+  </PageHead>
+
+  <section class="section section-tight" aria-labelledby="philosophy-heading">
+    <div class="wrap">
+      <div class="prose">
+        <h2 class="block-title" id="philosophy-heading">Philosophy</h2>
+        {teaching.philosophy.map((paragraph) => <p>{paragraph}</p>)}
+      </div>
+
+      <ol class="principles">
+        {
+          teaching.principles.map((principle, i) => (
+            <li>
+              <span class="q-no" aria-hidden="true">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <div>
+                <h3 class="principle-title">{principle.title}</h3>
+                <p>{principle.text}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="classroom-heading">
+    <div class="wrap">
+      <h2 class="section-label" id="classroom-heading">Classroom experience</h2>
+      <div class="course">
+        <div>
+          <p class="tag">{teaching.course.role}</p>
+          <h3 class="course-title">{teaching.course.title}</h3>
+          <p class="course-meta">{teaching.course.meta}</p>
+        </div>
+        <div>
+          <ul class="plain-list">
+            {teaching.course.points.map((point) => <li>{point}</li>)}
+          </ul>
+          <p class="course-example">
+            <span class="tag">In practice</span>
+            <span>{teaching.course.example}</span>
+          </p>
+        </div>
+      </div>
+      <p class="earlier">{teaching.earlier}</p>
+    </div>
+  </section>
+
+  <section class="section section-tight" aria-labelledby="courses-heading">
+    <div class="wrap">
+      <h2 class="block-title" id="courses-heading">Courses I am prepared to teach</h2>
+      <div class="duo">
+        <div>
+          <h3 class="section-label">Undergraduate</h3>
+          <ul class="plain-list">
+            {teaching.canTeach.undergraduate.map((course) => <li>{course}</li>)}
+          </ul>
+        </div>
+        <div>
+          <h3 class="section-label">Graduate</h3>
+          <ul class="plain-list">
+            {teaching.canTeach.graduate.map((course) => <li>{course}</li>)}
+            <li>{teaching.canTeach.proposed}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-tight" aria-labelledby="mentoring-heading">
+    <div class="wrap">
+      <h2 class="block-title" id="mentoring-heading">Mentoring record</h2>
+      <p class="section-intro">{teaching.mentoring.summary}</p>
+      <ul class="timeline">
+        {
+          teaching.mentoring.groups.map((group) => (
+            <li>
+              <p class="when">{group.when}</p>
+              <div>
+                <h3 class="timeline-title">{group.what}</h3>
+                <p>{group.detail}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="prose advising">
+        <h3 class="section-label">How I will advise</h3>
+        <p>{teaching.mentoring.advising}</p>
+      </div>
+    </div>
+  </section>
+</SiteLayout>

@@ -1,0 +1,32 @@
+---
+/**
+ * Renders the owner's portrait when one has been supplied, and nothing otherwise.
+ * "chip" is the small round photo beside the status line on the home page.
+ * "card" is the larger photo on the About page.
+ */
+import { Image } from 'astro:assets';
+import { portrait, portraitAlt } from '../../lib/portrait';
+
+interface Props {
+  variant: 'chip' | 'card';
+}
+
+const { variant } = Astro.props;
+---
+
+{
+  portrait && variant === 'chip' && (
+    <Image src={portrait} alt={portraitAlt} width={192} class="portrait-chip" loading="eager" />
+  )
+}
+{
+  portrait && variant === 'card' && (
+    <Image
+      src={portrait}
+      alt={portraitAlt}
+      widths={[360, 540, 720]}
+      sizes="(min-width: 60rem) 22rem, 70vw"
+      class="portrait-card"
+    />
+  )
+}

@@ -1,0 +1,209 @@
+---
+/**
+ * Skin Research and Technology 2021: the idea of the paper's two-layer method, run on
+ * three made-up pictures from three different uses of computer vision.
+ *
+ * The pictures and every tile are made by scripts/make-segment-demo.mjs, which also says
+ * what is simplified: a plain two-cluster step stands in for each of the paper's networks,
+ * and a simple vote stands in for its weighted consensus functions. The numbers under the
+ * tiles describe this demonstration only. The paper's own results are quoted separately.
+ */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import XFigure from './XFigure.astro';
+import demo from '../../data/segment-demo.json';
+
+const id = 'fig-segment';
+
+const files = import.meta.glob<{ default: ImageMetadata }>('../../assets/figures/segment/*.png', { eager: true });
+const tile = (name: string) => files[`../../assets/figures/segment/${name}.png`].default;
+
+const steps = [
+  {
+    name: 'Colour views',
+    title: 'Four colour views of one picture',
+    text: 'Full colour, red, lightness and saturation. What separates a region in one picture fails in the next, so the method looks at all four.',
+  },
+  {
+    name: 'First layer',
+    title: 'First layer: one learner for each view',
+    text: 'In the paper, four U-Net-style networks each learn one view with no labelled examples, and end by grouping the pixels in two. Here a plain two-group step stands in for each network. Each view is fooled by something different.',
+  },
+  {
+    name: 'Second layer',
+    title: 'Second layer: three classical methods',
+    text: 'Adaptive thresholding, K-means and region growing each segment what the first layer produced. The grey picture shows how many views agreed at each point.',
+  },
+  {
+    name: 'Consensus',
+    title: 'Consensus: one outline',
+    text: 'The seven results are merged into one outline. Here a simple vote is used. The paper proposes weighted consensus functions that do better than a vote.',
+  },
+];
+
+const stats = [
+  { value: '877', label: 'skin photographs' },
+  { value: '21', label: 'patients' },
+  { value: '97%', label: 'accuracy' },
+  { value: '98%', label: 'sensitivity' },
+  { value: '96%', label: 'specificity' },
+  { value: '97%', label: 'Dice index' },
+];
+---
+
+<XFigure
+  id={id}
+  no={6}
+  title="One method, three kinds of picture"
+  hint="Pick a picture, then follow the method step by step."
+>
+  {
+    steps.map((_, i) => (
+      <input class="xin xin-a" type="radio" name={`${id}-a`} id={`${id}-a${i + 1}`} value={i + 1} checked={i === 0} />
+    ))
+  }
+  {
+    demo.pictures.map((_, i) => (
+      <input class="xin xin-b" type="radio" name={`${id}-b`} id={`${id}-b${i + 1}`} value={i + 1} checked={i === 0} />
+    ))
+  }
+
+  <div class="seg-controls">
+    <div class="seg-pictures">
+      {
+        demo.pictures.map((picture, i) => (
+          <label class="seg-picture" for={`${id}-b${i + 1}`} data-pick-b={i + 1}>
+            <Image src={tile(picture.views[0].file)} alt="" widths={[120, 240, 360]} sizes="(min-width: 60rem) 3.4rem, 26vw" loading="lazy" />
+            <span>
+              <span class="xlabel">Picture {i + 1}</span>
+              <b>{picture.name}</b>
+            </span>
+          </label>
+        ))
+      }
+    </div>
+    <div class="xsteps" style="--n:4">
+      {
+        steps.map((step, i) => (
+          <label
+            class:list={['xstep', i === 1 && 'xnudge']}
+            for={`${id}-a${i + 1}`}
+            data-pick-a={i + 1}
+            data-a={steps.map((_, k) => k + 1).filter((k) => k >= i + 1).join(' ')}
+          >
+            <span class="xstep-no">{i + 1}</span>
+            <span class="xstep-name">{step.name}</span>
+          </label>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="xfig-stage seg">
+    <div class="xscreen seg-table">
+      {
+        demo.pictures.map((picture, b) => (
+          <div class="xswap" data-b={b + 1}>
+            <div class="xpanes">
+              <div class="xpane seg-tiles" data-a="1">
+                {picture.views.map((view, i) => (
+                  <figure class="seg-tile" style={`--i:${i}`}>
+                    <Image src={tile(view.file)} alt={`${picture.name}: the ${view.name.toLowerCase()} view`} widths={[240, 360]} sizes="(min-width: 50rem) 15rem, 44vw" loading="lazy" />
+                    <figcaption>{view.name}</figcaption>
+                  </figure>
+                ))}
+              </div>
+              <div class="xpane seg-tiles" data-a="2">
+                {picture.first.map((result, i) => (
+                  <figure class="seg-tile" style={`--i:${i}`}>
+                    <Image src={tile(result.file)} alt={`${picture.name}: the region found in the ${result.name.toLowerCase()} view, outlined`} widths={[240, 360]} sizes="(min-width: 50rem) 15rem, 44vw" loading="lazy" />
+                    <figcaption>
+                      {result.name}
+                      <span class="seg-match" style={`--m:${result.match}`}>
+                        <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false">
+                          <circle cx="18" cy="18" r="15" pathLength="100" />
+                          <circle class="seg-ring" cx="18" cy="18" r="15" pathLength="100" />
+                        </svg>
+                        {result.match}% match
+                      </span>
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+              <div class="xpane seg-tiles is-three" data-a="3">
+                {picture.second.map((result, i) => (
+                  <figure class="seg-tile" style={`--i:${i}`}>
+                    <Image src={tile(result.file)} alt={`${picture.name}: the region found by ${result.name.toLowerCase()}, outlined`} widths={[240, 360]} sizes="(min-width: 50rem) 15rem, 44vw" loading="lazy" />
+                    <figcaption>
+                      {result.name}
+                      <span class="seg-match" style={`--m:${result.match}`}>
+                        <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false">
+                          <circle cx="18" cy="18" r="15" pathLength="100" />
+                          <circle class="seg-ring" cx="18" cy="18" r="15" pathLength="100" />
+                        </svg>
+                        {result.match}% match
+                      </span>
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+              <div class="xpane seg-final" data-a="4">
+                <figure class="seg-tile is-large" style="--i:0">
+                  <Image src={tile(picture.final.file)} alt={`${picture.name}, with the consensus outline and the true region`} widths={[360]} sizes="20rem" loading="lazy" />
+                </figure>
+                <div class="seg-verdict" style="--i:2">
+                  <p class="seg-big">{picture.final.match}%</p>
+                  <p class="seg-big-label">of the true region matched by the consensus</p>
+                  <ul class="seg-alone">
+                    {picture.first.map((result) => (
+                      <li>
+                        <span>{result.name}</span>
+                        <span class="seg-bar"><i style={`--m:${result.match}`} /></span>
+                        <b>{result.match}%</b>
+                      </li>
+                    ))}
+                  </ul>
+                  <p class="seg-key"><i class="is-result"></i>consensus <i class="is-truth"></i>true region</p>
+                </div>
+              </div>
+            </div>
+            <p class="seg-note">A made-up picture, drawn by a small program: {picture.note.charAt(0).toLowerCase() + picture.note.slice(1)}</p>
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="seg-words">
+      <div class="xcard xpanes" aria-live="polite">
+        {
+          steps.map((step, i) => (
+            <div class="xpane" data-a={i + 1}>
+              <p class="xlabel">Step {i + 1} of 4</p>
+              <p class="xpane-title">{step.title}</p>
+              <p>{step.text}</p>
+            </div>
+          ))
+        }
+      </div>
+      <div class="xcard seg-paper">
+        <p class="xlabel">In the paper, on real skin images</p>
+        <ul class="seg-stats">
+          {
+            stats.map((stat) => (
+              <li>
+                <b>{stat.value}</b>
+                <span>{stat.label}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <Fragment slot="caption">
+    A demonstration computed for this site. The three pictures are made up, and “match” is the Dice index against
+    the region each picture was drawn with. The published results are for skin images only: Khatibi, Rezaei, Ataei
+    Fashtami &amp; Totonchi (2021), Skin Research and Technology 27(2).
+  </Fragment>
+</XFigure>

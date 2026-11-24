@@ -1,0 +1,22 @@
+---
+import { person } from '../../data/program';
+
+// The month the site was last built. It is rebuilt whenever its content changes.
+const updated = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+---
+
+<footer class="site-footer">
+  <div class="wrap footer-row">
+    <p class="footer-name">
+      <strong>{person.name}</strong>
+      <span>{person.role}, {person.unit}, {person.university}</span>
+    </p>
+    <ul class="footer-links">
+      <li><a href={`mailto:${person.email}`}>{person.email}</a></li>
+      <li><a href={person.scholar} rel="me noopener">Google Scholar</a></li>
+      <li><a href={person.linkedin} rel="me noopener">LinkedIn</a></li>
+      <li><a href="/contact">Contact</a></li>
+    </ul>
+    <p class="footer-updated">Last updated {updated}</p>
+  </div>
+</footer>

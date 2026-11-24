@@ -1,0 +1,239 @@
+---
+/**
+ * A small drawing that stands for one interactive figure, shown beside its paper.
+ * It links to the figure on the Research page. Each drawing is made here, in the
+ * same style as the figure it points to. Nothing is copied from a paper.
+ */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { faceLines, facePoints, corners } from '../../lib/face-marks';
+
+interface Props {
+  /** The figure's anchor on the Research page, such as "fig-session". */
+  figure: string;
+}
+
+const { figure } = Astro.props;
+const kind = figure.replace('fig-', '');
+
+const f1 = (v: number) => v.toFixed(1);
+type Faces = [string, string, string];
+
+// ---------- session: one station in a shallow three-quarter view ----------
+
+const KX = 0.36;
+const KY = 0.3;
+const BASE = 100;
+const P = (x: number, y: number, z: number) => `${f1(x + y * KX)} ${f1(BASE - z - y * KY)}`;
+const face = (pts: string[], fill: string) =>
+  `<path d="M${pts.join('L')}Z" fill="${fill}" stroke="rgba(22,19,16,.3)" stroke-width=".6" stroke-linejoin="round"/>`;
+const box = (x: number, y: number, z: number, w: number, d: number, h: number, [t, f, s]: Faces) =>
+  face([P(x + w, y, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x + w, y, z + h)], s) +
+  face([P(x, y, z + h), P(x + w, y, z + h), P(x + w, y + d, z + h), P(x, y + d, z + h)], t) +
+  face([P(x, y, z), P(x + w, y, z), P(x + w, y, z + h), P(x, y, z + h)], f);
+const FRAME: Faces = ['#f8f3ea', '#dfd5c5', '#c2b5a1'];
+const BENCH: Faces = ['#fdf9f1', '#e7ddcc', '#d0c3ad'];
+const DARK: Faces = ['#40352c', '#1d1814', '#0e0b09'];
+const COPPER: Faces = ['#e5ab8a', '#b0522a', '#6f2810'];
+const GREEN: Faces = ['#aac6b9', '#4d7a69', '#243f35'];
+const PART: Faces = ['#cf7d53', '#8d3514', '#4a1a09'];
+const FLOOR: Faces = ['#eae1cf', '#d9ccb7', '#c9bba3'];
+
+function sessionScene() {
+  const x0 = 96;
+  const W = 116;
+  const D = 40;
+  const TOP = 56;
+  const cx = x0 + W / 2;
+  let s = box(8, -24, -7, 224, 76, 7, FLOOR);
+  s += `<path d="M${P(x0 - 4, -6, 0.1)}L${P(x0 + W + 8, -6, 0.1)}L${P(x0 + W + 8, D + 6, 0.1)}L${P(x0 - 4, D + 6, 0.1)}Z" fill="#161310" opacity=".09"/>`;
+  s += box(x0 + 3, D - 7, 0, 4, 4, TOP, FRAME) + box(x0 + W - 7, D - 7, 0, 4, 4, TOP, FRAME);
+  s += box(x0 + 3, 2, 0, 4, 4, TOP, FRAME) + box(x0 + W - 7, 2, 0, 4, 4, TOP, FRAME);
+  s += box(x0, 0, TOP, W, D, 5, BENCH);
+  s += box(x0 + 3, D - 7, TOP + 5, 4, 4, 52, FRAME) + box(x0 + W - 7, D - 7, TOP + 5, 4, 4, 52, FRAME);
+  s += box(x0 + 3, D - 7, TOP + 57, W - 6, 4, 4, FRAME);
+  s += box(cx - 24, D - 10, TOP + 22, 48, 3, 30, DARK);
+  s += `<path d="M${P(cx - 21, D - 10, TOP + 25)}L${P(cx + 21, D - 10, TOP + 25)}L${P(cx + 21, D - 10, TOP + 49)}L${P(cx - 21, D - 10, TOP + 49)}Z" fill="#f4b58a"/>`;
+  for (let k = 0; k < 3; k++) {
+    s += `<path d="M${P(cx - 16, D - 10, TOP + 43 - k * 6.5)}L${P(cx + 8 - k * 6, D - 10, TOP + 43 - k * 6.5)}" stroke="#17130f" stroke-width="2" stroke-linecap="round" opacity=".65"/>`;
+  }
+  s += box(x0 + 9, D - 19, TOP + 5, 17, 9, 8, COPPER) + box(x0 + 29, D - 19, TOP + 5, 17, 9, 8, GREEN);
+  s += box(cx - 22, 10, TOP + 5, 10, 10, 8, PART) + box(cx - 9, 10, TOP + 5, 10, 10, 12, PART);
+  s += box(cx + 22, 16, TOP + 5, 28, 3, 20, DARK);
+  s += `<path d="M${P(cx + 24, 16, TOP + 7.5)}L${P(cx + 48, 16, TOP + 7.5)}L${P(cx + 48, 16, TOP + 22.5)}L${P(cx + 24, 16, TOP + 22.5)}Z" fill="#f4b58a"/>`;
+  s += `<path d="M${P(cx + 33, 16, TOP + 11)}L${P(cx + 33, 16, TOP + 19)}L${P(cx + 40, 16, TOP + 15)}Z" fill="#17130f"/>`;
+  return s;
+}
+
+const wave = Array.from({ length: 61 }, (_, i) => {
+  const x = (i / 60) * 240;
+  return `${i === 0 ? 'M' : 'L'}${f1(x)} ${f1(134 + 5.5 * Math.sin(x * 0.085) + 2 * Math.sin(x * 0.26))}`;
+}).join('');
+
+// ---------- layers: three slabs in isometric view ----------
+
+const S = 8.6;
+const C = Math.cos(Math.PI / 6);
+const iso = (x: number, y: number, z: number) => `${f1(160 + (x - y) * C * S)} ${f1(33 + (x + y) * 0.5 * S - z * S)}`;
+const poly = (pts: string[], fill: string) =>
+  `<path d="M${pts.join('L')}Z" fill="${fill}" stroke="rgba(22,19,16,.34)" stroke-width=".6" stroke-linejoin="round"/>`;
+function slab(z: number, [t, l, r]: Faces) {
+  const W = 6;
+  const T = 0.32;
+  return (
+    poly([iso(0, W, z), iso(W, W, z), iso(W, W, z - T), iso(0, W, z - T)], l) +
+    poly([iso(W, 0, z), iso(W, W, z), iso(W, W, z - T), iso(W, 0, z - T)], r) +
+    poly([iso(0, 0, z), iso(W, 0, z), iso(W, W, z), iso(0, W, z)], t)
+  );
+}
+function column(x: number, y: number, z: number, h: number, [t, l, r]: Faces) {
+  const A = 1.2;
+  return (
+    poly([iso(x, y + A, z), iso(x + A, y + A, z), iso(x + A, y + A, z + h), iso(x, y + A, z + h)], l) +
+    poly([iso(x + A, y, z), iso(x + A, y + A, z), iso(x + A, y + A, z + h), iso(x + A, y, z + h)], r) +
+    poly([iso(x, y, z + h), iso(x + A, y, z + h), iso(x + A, y + A, z + h), iso(x, y + A, z + h)], t)
+  );
+}
+const stack =
+  slab(-6.6, ['#f8e6da', '#e5ab8a', '#cf7d53']) +
+  column(1.3, 4.6, -6.6, 1.4, ['#cf7d53', '#8d3514', '#4a1a09']) +
+  column(3.0, 3.0, -6.6, 1.8, ['#cf7d53', '#8d3514', '#4a1a09']) +
+  column(4.6, 1.3, -6.6, 1.2, ['#cf7d53', '#8d3514', '#4a1a09']) +
+  slab(-3.3, ['#e6efea', '#aac6b9', '#7fa593']) +
+  column(3.0, 3.0, -3.3, 1.6, ['#7fa593', '#33594b', '#14241e']) +
+  slab(0, ['#fbf7ef', '#d6cab6', '#bfb19a']) +
+  column(3.0, 3.0, 0, 1.9, ['#5b5046', '#2d2620', '#17130f']);
+
+// ---------- survey: bars, and curves to three technologies ----------
+
+const bars = [11, 9, 9, 8, 7, 5];
+const nodes = [
+  { y: 28, colour: '#b0522a' },
+  { y: 66, colour: '#2d2620' },
+  { y: 104, colour: '#4d7a69' },
+];
+const flows: [number, number][] = [[0, 0], [1, 0], [2, 1], [2, 2], [3, 1], [4, 1], [4, 2], [5, 0], [5, 1]];
+const barY = (i: number) => 22 + i * 17;
+
+// ---------- segment: the three made-up pictures with their outlines ----------
+
+const tiles = import.meta.glob<{ default: ImageMetadata }>('../../assets/figures/segment/*-final.png', { eager: true });
+const tile = (name: string) => tiles[`../../assets/figures/segment/${name}-final.png`].default;
+
+const names: Record<string, string> = {
+  session: 'the study session',
+  vision: 'the two-camera framework',
+  layers: 'the three-layer example',
+  survey: 'the industry survey',
+  segment: 'the segmentation method',
+};
+---
+
+<a class:list={['fthumb', `is-${kind}`]} href={`/research#${figure}`} aria-label={`Try the figure: ${names[kind]}`}>
+  {
+    kind === 'session' && (
+      <svg viewBox="0 0 240 156" aria-hidden="true" focusable="false">
+        <rect width="240" height="156" fill="#f3ebdd" />
+        <Fragment set:html={sessionScene()} />
+        <g transform="translate(72 107) scale(.74)">
+          <ellipse cx="3" cy="1" rx="17" ry="4.2" fill="rgba(22,19,16,.17)" />
+          <path d="M-8.5 -58L-9 -3Q-9 0-6 0H-1V-58Z M1 -58V0H6Q9 0 9 -3L8.5 -58Z" fill="#211b16" />
+          <path d="M-13 -104Q-13 -113-5 -113H5Q13 -113 13 -104L11 -55Q11 -51 7 -51H-7Q-11 -51-11 -55Z" fill="#8d3514" />
+          <path d="M9 -105L19 -88" fill="none" stroke="#8d3514" stroke-width="9" stroke-linecap="round" />
+          <path d="M20 -87L37 -89" fill="none" stroke="#efdcc6" stroke-width="6" stroke-linecap="round" />
+          <circle cx="40" cy="-89" r="4.2" fill="#efdcc6" />
+          <rect x="27" y="-93.5" width="6.5" height="9" rx="2" fill="#211b16" />
+          <circle cx="30.2" cy="-89" r="2.4" fill="#f4b58a" />
+          <rect x="-3" y="-119" width="6" height="8" fill="#efdcc6" />
+          <circle cx="0" cy="-127" r="11" fill="#efdcc6" />
+          <path d="M-11.6 -121Q-14 -140.5 0 -140.5Q14 -140.5 11.6 -121Q11.4 -117 9.6 -115.5Q10.6 -128 3 -131.5Q-5.5 -132.5-8.8 -125Q-9.8 -120-9.4 -115.5Q-11.4 -117-11.6 -121Z" fill="#211b16" />
+        </g>
+        <rect y="119" width="240" height="37" fill="#17130f" />
+        <rect x="96" y="119" width="52" height="37" fill="#f4b58a" opacity=".16" />
+        <path d={wave} fill="none" stroke="#f4b58a" stroke-width="1.5" stroke-linejoin="round" />
+        <path d="M22 149h34M62 149h28M102 149h40M150 149h30M188 149h30" stroke="#a4dbc5" stroke-width="3" stroke-linecap="round" />
+      </svg>
+    )
+  }
+  {
+    kind === 'vision' && (
+      <svg viewBox="50 30 220 143" aria-hidden="true" focusable="false">
+        <defs>
+          <radialGradient id="fthumb-bg" cx="50%" cy="36%" r="80%">
+            <stop offset="0" stop-color="#33413b" />
+            <stop offset="1" stop-color="#121815" />
+          </radialGradient>
+          <linearGradient id="fthumb-tone" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#a9c0b5" />
+            <stop offset="1" stop-color="#718c80" />
+          </linearGradient>
+        </defs>
+        <rect x="0" y="0" width="320" height="230" fill="url(#fthumb-bg)" />
+        <path d="M48 230Q54 180 120 167H200Q266 180 272 230Z" fill="#4a6055" />
+        <path d="M140 148H180V170Q160 187 140 170Z" fill="#86a295" />
+        <ellipse cx="119" cy="113" rx="5.5" ry="9.5" fill="#7b968a" />
+        <ellipse cx="201" cy="113" rx="5.5" ry="9.5" fill="#7b968a" />
+        <ellipse cx="160" cy="108" rx="40" ry="50" fill="url(#fthumb-tone)" />
+        <path d="M119 106Q110 50 160 50Q210 50 201 106Q199 80 181 73Q151 65 133 80Q121 90 119 106Z" fill="#232c28" />
+        <path d={corners(106, 42, 214, 168)} fill="none" stroke="#f4b58a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        {faceLines.map((d) => <path d={d} fill="none" stroke="#f4b58a" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />)}
+        {facePoints.map(([x, y]) => <circle cx={x} cy={y} r="2" fill="#f4b58a" />)}
+        <circle cx="64" cy="43" r="3.6" fill="#ff7a59" />
+      </svg>
+    )
+  }
+  {
+    kind === 'layers' && (
+      <svg viewBox="0 0 240 156" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="fthumb-area" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#8d3514" stop-opacity=".3" />
+            <stop offset="1" stop-color="#8d3514" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        <rect width="240" height="156" fill="#f3ebdd" />
+        <path d="M18 112C38 70 60 54 96 50V112Z" fill="url(#fthumb-area)" />
+        <path d="M18 40V112H100" fill="none" stroke="#161310" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M18 112C38 70 60 54 96 50" fill="none" stroke="#161310" stroke-width="2.4" stroke-linecap="round" />
+        <path d="M51 68V112" fill="none" stroke="#8d3514" stroke-width="1.2" stroke-dasharray="2.5 3" />
+        <circle cx="51" cy="68" r="5" fill="#8d3514" stroke="#fffdf9" stroke-width="2" />
+        <Fragment set:html={stack} />
+      </svg>
+    )
+  }
+  {
+    kind === 'survey' && (
+      <svg viewBox="0 0 240 156" aria-hidden="true" focusable="false">
+        <rect width="240" height="156" fill="#fffdf9" />
+        {flows.map(([row, node]) => (
+          <path
+            d={`M112 ${barY(row)}C150 ${barY(row)} 152 ${nodes[node].y} 186 ${nodes[node].y}`}
+            fill="none"
+            stroke={nodes[node].colour}
+            stroke-width="1.6"
+            stroke-linecap="round"
+            opacity=".85"
+          />
+        ))}
+        {bars.map((n, i) => <rect x="16" y={barY(i) - 4.5} width={n * 7.6} height="9" rx="4.5" fill="#161310" />)}
+        {nodes.map((node) => <rect x="186" y={node.y - 11} width="40" height="22" rx="6" fill="#fffdf9" stroke={node.colour} stroke-width="2" />)}
+        {nodes.map((node) => <circle cx="198" cy={node.y} r="4" fill={node.colour} />)}
+      </svg>
+    )
+  }
+  {
+    kind === 'segment' && (
+      <span class="fthumb-tiles" aria-hidden="true">
+        <Image src={tile('metal')} alt="" width={280} height={280} loading="lazy" />
+        <Image src={tile('skin')} alt="" width={280} height={280} loading="lazy" />
+        <Image src={tile('bench')} alt="" width={280} height={280} loading="lazy" />
+      </span>
+    )
+  }
+  <span class="fthumb-cta">
+    <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+      <path d="M5 2.5v8.2l2.2-1.9 1.7 3.9 1.6-.7-1.7-3.8 2.9-.2z"></path>
+    </svg>
+    Try the figure
+  </span>
+</a>

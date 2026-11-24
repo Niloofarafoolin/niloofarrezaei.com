@@ -1,0 +1,79 @@
+---
+/**
+ * A banner for the Teaching page: the three things its title names.
+ * Hardware, real data, and the people inside the system. Drawn for this site.
+ */
+import { MAT, makeIso, operator } from '../../lib/iso';
+
+const f1 = (v: number) => v.toFixed(1);
+
+function hardware() {
+  const { P, shape, front, box, shadow } = makeIso(0.4, 0.32, 172);
+  let s = box(26, -20, -8, 268, 112, 8, MAT.floor);
+  s += shadow(84, 22, 150, 50);
+  s += box(88, 64, 0, 6, 6, 66, MAT.frame) + box(224, 64, 0, 6, 6, 66, MAT.frame);
+  s += box(88, 26, 0, 6, 6, 66, MAT.frame) + box(224, 26, 0, 6, 6, 66, MAT.frame);
+  s += box(84, 22, 66, 150, 50, 6, MAT.bench);
+  s += box(88, 64, 72, 6, 6, 70, MAT.frame) + box(224, 64, 72, 6, 6, 70, MAT.frame) + box(88, 64, 142, 142, 6, 6, MAT.frame);
+  s += box(128, 60, 100, 62, 4, 38, MAT.dark);
+  s += shape(front(131, 60, 103, 56, 32), '#f4b58a', '');
+  s += [0, 1, 2].map((k) => shape(front(137, 60, 126 - k * 8, 34 - k * 8, 3), '#17130f', 'opacity=".6"')).join('');
+  s += box(96, 56, 72, 24, 12, 12, MAT.copper) + box(124, 56, 72, 24, 12, 12, MAT.green);
+  s += box(120, 30, 72, 60, 24, 3, MAT.steel);
+  s += box(126, 34, 75, 13, 13, 10, MAT.part) + box(143, 34, 75, 13, 13, 15, MAT.part) + box(161, 36, 75, 12, 12, 7, MAT.green);
+  s += `<path d="M${P(196, 30, 72.4)}L${P(222, 30, 72.4)}L${P(222, 50, 72.4)}L${P(196, 50, 72.4)}Z" fill="#fffdf9" stroke="rgba(22,19,16,.35)" stroke-width=".7"/>`;
+  return s;
+}
+
+// A sensor log as it really arrives: noisy, with a stretch missing.
+const log = (from: number, to: number) =>
+  Array.from({ length: to - from + 1 }, (_, k) => {
+    const i = from + k;
+    const x = 22 + i * 4.6;
+    const y = 74 + 13 * Math.sin(i * 0.33) + 5 * Math.sin(i * 1.3) + (i === 12 ? -26 : 0) + (i === 50 ? 20 : 0);
+    return `${k === 0 ? 'M' : 'L'}${f1(x)} ${f1(y)}`;
+  }).join('');
+const ticks = [0, 1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16].map((i) => `M${f1(26 + i * 17.4)} 150v-${6 + (i % 4) * 3}`).join('');
+
+function people() {
+  const { xy, box, shadow } = makeIso(0.4, 0.32, 172);
+  let s = box(26, -20, -8, 268, 112, 8, MAT.floor);
+  s += shadow(122, 26, 76, 40);
+  s += box(126, 58, 0, 5, 5, 52, MAT.frame) + box(190, 58, 0, 5, 5, 52, MAT.frame);
+  s += box(126, 28, 0, 5, 5, 52, MAT.frame) + box(190, 28, 0, 5, 5, 52, MAT.frame);
+  s += box(122, 26, 52, 76, 40, 6, MAT.bench);
+  s += box(140, 34, 58, 13, 13, 10, MAT.part) + box(157, 34, 58, 13, 13, 6, MAT.green);
+  const [ax, ay] = xy(98, 16, 0);
+  s += operator(ax, ay, 0.86);
+  const [bx, by] = xy(236, 20, 0);
+  // A second person, facing the first across the bench.
+  s += `<g transform="translate(${f1(bx)} 0) scale(-1 1) translate(${f1(-bx)} 0)">${operator(bx, by, 0.86, { shirt: '#33594b', shirtDark: '#243f35' })}</g>`;
+  return s;
+}
+---
+
+<figure class="teach-art" aria-label="Three drawings: a workstation, a sensor log with a gap in it, and two people at a bench.">
+  <div class="teach-plate">
+    <svg viewBox="0 0 320 196" aria-hidden="true" focusable="false">
+      <Fragment set:html={hardware()} />
+    </svg>
+    <p><span>01</span>Hardware</p>
+  </div>
+  <div class="teach-plate is-dark">
+    <svg viewBox="0 0 320 196" aria-hidden="true" focusable="false">
+      <path d="M16 46H304M16 86H304M16 126H304" stroke="rgba(255,255,255,.07)"></path>
+      <rect x="146" y="26" width="46" height="136" fill="rgba(239,230,216,.06)" stroke="rgba(239,230,216,.35)" stroke-dasharray="4 4"></rect>
+      <path d={log(0, 26)} fill="none" stroke="#f4b58a" stroke-width="2" stroke-linejoin="round"></path>
+      <path d={log(37, 61)} fill="none" stroke="#f4b58a" stroke-width="2" stroke-linejoin="round"></path>
+      <path d={ticks} fill="none" stroke="#a4dbc5" stroke-width="2.4" stroke-linecap="round"></path>
+      <circle cx="77.2" cy="50" r="7" fill="none" stroke="#fdf3e3" stroke-width="1.4" stroke-dasharray="2 3"></circle>
+    </svg>
+    <p><span>02</span>Real data</p>
+  </div>
+  <div class="teach-plate">
+    <svg viewBox="0 0 320 196" aria-hidden="true" focusable="false">
+      <Fragment set:html={people()} />
+    </svg>
+    <p><span>03</span>People</p>
+  </div>
+</figure>

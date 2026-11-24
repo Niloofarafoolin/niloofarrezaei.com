@@ -1,0 +1,49 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import PageHead from '../components/site/PageHead.astro';
+import PublicationItem from '../components/site/PublicationItem.astro';
+import { person } from '../data/program';
+import { publications, groupOrder, groupTitles } from '../data/publications';
+
+const groups = groupOrder
+  .map((group) => ({
+    group,
+    title: groupTitles[group],
+    items: publications.filter((item) => item.group === group),
+  }))
+  .filter((entry) => entry.items.length > 0);
+---
+
+<SiteLayout
+  title="Publications"
+  description="Peer-reviewed publications and manuscripts under review by Niloofar Rezaei, with a one-sentence takeaway for each."
+>
+  <PageHead
+    label="Publications"
+    title="Publications"
+    lede="Peer-reviewed work and one manuscript under review. Each entry has a one-sentence takeaway and states my role."
+  >
+    <p class="page-links">
+      <a href={person.scholar} rel="me noopener">Google Scholar profile</a>
+    </p>
+  </PageHead>
+
+  <div class="section section-tight">
+    <div class="wrap">
+      {
+        groups.map((entry) => (
+          <section class="pub-group" aria-labelledby={`group-${entry.group}`}>
+            <h2 class="block-title" id={`group-${entry.group}`}>
+              {entry.title}
+            </h2>
+            <ol class="pubs">
+              {entry.items.map((item) => (
+                <PublicationItem item={item} />
+              ))}
+            </ol>
+          </section>
+        ))
+      }
+    </div>
+  </div>
+</SiteLayout>

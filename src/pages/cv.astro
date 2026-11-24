@@ -1,0 +1,182 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import PageHead from '../components/site/PageHead.astro';
+import { person, recognition } from '../data/program';
+import { education, appointments, scholarships, presentations, service, skills } from '../data/cv';
+import { teaching } from '../data/teaching';
+---
+
+<SiteLayout
+  title="CV"
+  description="Curriculum vitae of Niloofar Rezaei: education, research appointments, awards, teaching, presentations and service."
+>
+  <PageHead
+    label="Curriculum vitae"
+    title="CV"
+    lede={`${person.role} (${person.emphasis}), ${person.unit}, ${person.university}`}
+  >
+    <p class="page-links">
+      {
+        person.cvPdf && (
+          <a class="btn btn-primary" href={person.cvPdf}>
+            Download CV <span class="btn-meta">PDF</span>
+          </a>
+        )
+      }
+      <a href={`mailto:${person.email}`}>{person.email}</a>
+      <a href={person.scholar} rel="me noopener">Google Scholar</a>
+      <a href={person.linkedin} rel="me noopener">LinkedIn</a>
+    </p>
+  </PageHead>
+
+  <div class="section section-tight">
+    <div class="wrap cv">
+      <section aria-labelledby="cv-education">
+        <h2 class="block-title" id="cv-education">Education</h2>
+        <ul class="timeline">
+          {
+            education.map((entry) => (
+              <li>
+                <p class="when">{entry.when}</p>
+                <div>
+                  <h3 class="timeline-title">{entry.degree}</h3>
+                  <p class="timeline-place">{entry.place}</p>
+                  {entry.notes.map((note) => <p>{note}</p>)}
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section aria-labelledby="cv-research">
+        <h2 class="block-title" id="cv-research">Research appointments</h2>
+        <ul class="timeline">
+          {
+            appointments.map((entry) => (
+              <li>
+                <p class="when">{entry.when}</p>
+                <div>
+                  <h3 class="timeline-title">{entry.title}</h3>
+                  <p class="timeline-place">{entry.place}</p>
+                  <ul class="plain-list">
+                    {entry.notes.map((note) => <li>{note}</li>)}
+                  </ul>
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section aria-labelledby="cv-publications">
+        <h2 class="block-title" id="cv-publications">Publications</h2>
+        <p class="cv-pointer">
+          Listed with takeaways and links on the <a href="/publications">Publications page</a>.
+        </p>
+      </section>
+
+      <section aria-labelledby="cv-awards">
+        <h2 class="block-title" id="cv-awards">Awards and honors</h2>
+        <ul class="timeline">
+          {
+            recognition.filter((item) => !item.homeOnly).map((item) => (
+              <li>
+                <p class="when">{item.year}</p>
+                <div>
+                  <h3 class="timeline-title">{item.title}</h3>
+                  <p>{item.detail}</p>
+                  {item.links && (
+                    <p class="proof-links">
+                      {item.links.map((link) => (
+                        <a href={link.href} rel="noopener">
+                          {link.label}
+                        </a>
+                      ))}
+                    </p>
+                  )}
+                </div>
+              </li>
+            ))
+          }
+          <li>
+            <p class="when">2024–2025</p>
+            <div>
+              <h3 class="timeline-title">Academic scholarships and travel grants</h3>
+              <p>{scholarships}</p>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="cv-teaching">
+        <h2 class="block-title" id="cv-teaching">Teaching and mentoring</h2>
+        <ul class="timeline">
+          <li>
+            <p class="when">Fall 2025</p>
+            <div>
+              <h3 class="timeline-title">{teaching.course.role}: {teaching.course.title}</h3>
+              <p>{teaching.course.points[0]}</p>
+            </div>
+          </li>
+          {
+            teaching.mentoring.groups.map((group) => (
+              <li>
+                <p class="when">{group.when}</p>
+                <div>
+                  <h3 class="timeline-title">{group.what}</h3>
+                  <p>{group.detail}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="cv-pointer">More on the <a href="/teaching">Teaching and mentoring page</a>.</p>
+      </section>
+
+      <section aria-labelledby="cv-talks">
+        <h2 class="block-title" id="cv-talks">Presentations</h2>
+        <ul class="timeline">
+          {
+            presentations.map((talk) => (
+              <li>
+                <p class="when">{talk.when}</p>
+                <div>
+                  <h3 class="timeline-title">{talk.title}</h3>
+                  <p>
+                    {talk.kind}. {talk.where}.
+                  </p>
+                  {talk.link && (
+                    <p class="proof-links">
+                      <a href={talk.link.href} rel="noopener">
+                        {talk.link.label}
+                      </a>
+                    </p>
+                  )}
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section aria-labelledby="cv-service">
+        <h2 class="block-title" id="cv-service">Service, outreach and prior roles</h2>
+        <dl class="schema">
+          {
+            service.map((entry) => (
+              <div>
+                <dt>{entry.label}</dt>
+                <dd>{entry.text}</dd>
+              </div>
+            ))
+          }
+          <div>
+            <dt>Technical skills</dt>
+            <dd>{skills}</dd>
+          </div>
+        </dl>
+      </section>
+    </div>
+  </div>
+</SiteLayout>

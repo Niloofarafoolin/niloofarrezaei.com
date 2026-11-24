@@ -1,0 +1,526 @@
+/* ==========================================================================
+   Recognition: the awards, told with photographs (home page).
+   The section sits on the dark band defined in site.css.
+   ========================================================================== */
+
+.recog {
+  --glow: #f4b58a;
+  --cream: #fff8ee;
+  --soft: rgba(239, 230, 216, 0.76);
+  --rule: rgba(239, 230, 216, 0.18);
+  --spring: cubic-bezier(0.3, 0.7, 0.2, 1);
+  padding-block: clamp(3rem, 6.5vw, 5rem);
+}
+
+.recog-head {
+  display: grid;
+  gap: 0.7rem;
+  margin-bottom: clamp(1.5rem, 3vw, 2.2rem);
+}
+
+.recog .section-label {
+  margin-bottom: 0;
+}
+
+.recog .section-label::before {
+  content: '';
+  display: block;
+  width: 2.4rem;
+  height: 3px;
+  margin-bottom: 0.9rem;
+  border-radius: 2px;
+  background: var(--glow);
+}
+
+.recog-title {
+  max-width: 16em;
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  font-size: clamp(1.9rem, 1.25rem + 2.4vw, 3.1rem);
+  line-height: 1.05;
+  letter-spacing: var(--display-tracking);
+  color: var(--cream);
+  text-wrap: balance;
+}
+
+.recog-title em {
+  color: var(--glow);
+  font-style: italic;
+}
+
+/* ---------- Words that go with an award ---------- */
+
+.recog-kicker {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin-bottom: 0.4rem;
+  font-family: var(--font-label);
+  font-size: 0.74rem;
+  font-weight: var(--label-weight);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--glow);
+}
+
+.band.is-dark .recog-kicker {
+  color: var(--glow);
+}
+
+.recog-kicker span {
+  padding: 0.1rem 0.5rem;
+  border: 1px solid rgba(244, 181, 138, 0.55);
+  border-radius: 999px;
+  color: var(--cream);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+}
+
+.recog-name {
+  font-family: var(--font-display);
+  font-weight: var(--heading-weight);
+  font-size: 1.28rem;
+  line-height: 1.2;
+  letter-spacing: -0.008em;
+  text-wrap: balance;
+}
+
+.recog-name.is-large {
+  max-width: 19em;
+  font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.2rem);
+  line-height: 1.1;
+  letter-spacing: -0.014em;
+}
+
+/* ---------- The first award, as a story in four photos ---------- */
+
+.recog-feature {
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--rule);
+}
+
+.recog-feature-head {
+  display: grid;
+  gap: 0.9rem 3rem;
+  margin-bottom: 1.5rem;
+}
+
+.recog-about {
+  display: grid;
+  gap: 0.2rem;
+  font-size: 0.97rem;
+  line-height: 1.5;
+}
+
+.recog-story {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.recog-tile {
+  position: relative;
+  margin: 0;
+  border-radius: 12px;
+  background: #0c0a08;
+  box-shadow:
+    0 0 0 1px rgba(255, 248, 238, 0.14),
+    0 26px 46px -24px rgba(0, 0, 0, 0.95);
+  overflow: hidden;
+}
+
+.band.is-dark .recog-tile img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  object-fit: cover;
+}
+
+.recog-tile.is-tall {
+  aspect-ratio: 0.84;
+}
+
+.recog-tile.is-talk {
+  grid-area: 1 / 1;
+}
+
+.recog-tile.is-talk img {
+  object-position: 42% 12%;
+}
+
+.recog-tile.is-gala {
+  grid-area: 1 / 2;
+}
+
+.recog-tile.is-gala img {
+  object-position: 50% 30%;
+}
+
+.recog-tile.is-strip {
+  grid-column: 1 / -1;
+  aspect-ratio: 2.2;
+}
+
+.recog-no {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  display: grid;
+  place-items: center;
+  min-width: 2rem;
+  height: 1.5rem;
+  padding-inline: 0.45rem;
+  border-radius: 999px;
+  background: rgba(23, 19, 15, 0.84);
+  box-shadow: 0 0 0 1px rgba(244, 181, 138, 0.5);
+  color: var(--glow);
+  font-family: var(--font-label);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+.recog-legend {
+  display: grid;
+  gap: 0.55rem 0.6rem;
+  margin-top: 0.95rem;
+  font-size: 0.88rem;
+  line-height: 1.42;
+}
+
+.recog-legend > div {
+  display: grid;
+  gap: 0.55rem;
+  align-content: start;
+}
+
+.recog-legend p {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  gap: 0.5rem;
+}
+
+.recog-legend b {
+  color: var(--glow);
+  font-family: var(--font-label);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.75;
+}
+
+.recog-legend strong {
+  color: var(--cream);
+  font-weight: 650;
+}
+
+.recog-legend i {
+  margin-left: 0.5rem;
+  font-family: var(--font-label);
+  font-size: 0.7rem;
+  font-style: normal;
+  font-weight: var(--label-weight);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: rgba(239, 230, 216, 0.56);
+}
+
+.recog-legend span span {
+  display: block;
+}
+
+.band.is-dark .recog-credit {
+  margin-top: 0.7rem;
+  font-size: 0.76rem;
+  color: rgba(239, 230, 216, 0.62);
+}
+
+@media (min-width: 52rem) {
+  .recog-feature-head {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    align-items: end;
+  }
+
+  /* Three columns: the talk, then the announcement over the team, then the award. */
+  .recog-story,
+  .recog-legend {
+    grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.1fr) minmax(0, 1.1fr);
+  }
+
+  .recog-tile.is-tall {
+    aspect-ratio: auto;
+  }
+
+  .band.is-dark .recog-tile.is-tall img {
+    position: absolute;
+    inset: 0;
+  }
+
+  .recog-tile.is-talk {
+    grid-area: 1 / 1 / 3 / 2;
+  }
+
+  .recog-tile.is-strip.is-first {
+    grid-area: 1 / 2;
+  }
+
+  .recog-tile.is-strip.is-second {
+    grid-area: 2 / 2;
+  }
+
+  .recog-tile.is-gala {
+    grid-area: 1 / 3 / 3 / 4;
+  }
+}
+
+/* ---------- The other awards, as cards ---------- */
+
+.recog-more {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
+  margin-top: clamp(2rem, 4vw, 2.75rem);
+}
+
+.recog-more > *,
+.recog-card > * {
+  min-width: 0;
+}
+
+.recog-card {
+  display: grid;
+  align-content: start;
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  background: rgba(255, 248, 238, 0.045);
+  overflow: hidden;
+}
+
+.recog-card .recog-tile {
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.recog-tile.is-group {
+  aspect-ratio: 2.31;
+}
+
+.recog-tile.is-lineup {
+  aspect-ratio: 1.805;
+}
+
+.recog-tile.is-screen {
+  aspect-ratio: 1.5;
+}
+
+.band.is-dark .recog-tile.is-screen img {
+  object-position: 50% 42%;
+}
+
+.recog-media {
+  position: relative;
+}
+
+/* The line with my name, cut from the photo of the slide and laid over the group photo like a paper strip. */
+.recog-clip {
+  position: relative;
+  width: 90%;
+  margin: -1.9rem auto 0;
+  border-radius: 3px;
+  box-shadow:
+    0 0 0 1px rgba(22, 19, 16, 0.25),
+    0 14px 26px -10px rgba(0, 0, 0, 0.85);
+  transform: rotate(-0.9deg);
+  overflow: hidden;
+}
+
+.band.is-dark .recog-clip img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.recog-body {
+  display: grid;
+  gap: 0.35rem;
+  align-content: start;
+  padding: 1.15rem 1.3rem 1.35rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.recog-body .recog-kicker {
+  margin-bottom: 0.1rem;
+}
+
+.recog-body.is-split > div {
+  display: grid;
+  gap: 0.35rem;
+  align-content: start;
+}
+
+.band.is-dark .recog-capline {
+  font-size: 0.84rem;
+  color: rgba(239, 230, 216, 0.6);
+}
+
+/* The reviewer award: "1 of 4" in large type over the words. */
+.band.is-dark .recog-count {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 2.3rem + 2.6vw, 4.4rem);
+  font-weight: 500;
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  color: var(--glow);
+}
+
+.recog-count i {
+  font-size: 0.4em;
+  font-style: italic;
+  letter-spacing: 0;
+  color: var(--soft);
+}
+
+/* From a tablet up, the scholarship is a low ribbon: a slice of the screen, then the words. */
+@media (min-width: 44rem) {
+  .recog-card.is-iaap {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+    align-items: center;
+  }
+
+  .recog-card.is-iaap .recog-tile {
+    align-self: stretch;
+    min-height: 10.5rem;
+    aspect-ratio: auto;
+  }
+
+  .band.is-dark .recog-card.is-iaap .recog-tile img {
+    position: absolute;
+    inset: 0;
+    object-position: 50% 61%;
+  }
+}
+
+/* On a wide screen the cards run across, and the photo changes side from one card to the next. */
+@media (min-width: 60rem) {
+  .recog-card.is-essay {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .recog-card.is-essay .recog-media {
+    padding-bottom: 1.3rem;
+  }
+
+  .recog-tile.is-group {
+    aspect-ratio: 2.06;
+  }
+
+  .recog-card.is-reviewer {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+    align-items: center;
+  }
+
+  /* The photo keeps its shape, and grows only if the words beside it need more room. */
+  .recog-card.is-reviewer .recog-tile {
+    grid-area: 1 / 2;
+    align-self: stretch;
+    aspect-ratio: auto;
+  }
+
+  .recog-card.is-reviewer .recog-tile::before {
+    content: '';
+    display: block;
+    padding-top: 50.25%;
+  }
+
+  .band.is-dark .recog-card.is-reviewer .recog-tile img {
+    position: absolute;
+    inset: 0;
+    object-position: 50% 88%;
+  }
+
+  .recog-card.is-reviewer .recog-body {
+    grid-area: 1 / 1;
+  }
+
+  .recog-card.is-essay .recog-body,
+  .recog-card.is-reviewer .recog-body,
+  .recog-card.is-iaap .recog-body {
+    padding: 1.4rem 1.7rem;
+  }
+
+  .recog-body.is-split {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 0.35rem 2.2rem;
+  }
+}
+
+@media (max-width: 40rem) {
+  /* On a phone the strip is shown at reading size and cut off at the right. */
+  .recog-clip {
+    width: 94%;
+    height: 3.1rem;
+  }
+
+  /* Taken out of the flow, so its full width does not stretch the card. */
+  .band.is-dark .recog-clip img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: auto;
+    max-width: none;
+    height: 100%;
+  }
+}
+
+/* ---------- Motion ---------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  .recog-tile img {
+    transition: transform 0.7s var(--spring);
+  }
+
+  .recog-tile:hover img {
+    transform: scale(1.035);
+  }
+
+  .recog-clip {
+    transition: transform 0.5s var(--spring);
+  }
+
+  .recog-card.is-essay:hover .recog-clip {
+    transform: rotate(0deg) translateY(-3px);
+  }
+
+  /* Written out in full for the same reason as in site.css: a short "animation" form would be
+     folded together with the timeline by the build, and browsers reject the result. */
+  @supports (animation-timeline: view()) and (animation-range: entry 0% entry 38%) {
+    .recog-tile,
+    .recog-card {
+      animation-name: rise-in;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 38%;
+    }
+
+    .recog-card .recog-tile {
+      animation-name: none;
+      animation-timeline: auto;
+    }
+  }
+}

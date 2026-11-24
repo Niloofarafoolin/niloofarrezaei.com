@@ -1,0 +1,269 @@
+---
+/**
+ * The home page figure: how the research program fits together.
+ * A station is observed through three signals, the operator's load is estimated with
+ * its uncertainty, and the system holds while it is unsure and acts once it is confident.
+ *
+ * The scene is an illustration and the traces are synthetic (src/lib/traces.ts).
+ * Neither is study data, and the caption says so.
+ */
+import XFigure from './XFigure.astro';
+import XFigureHead from './XFigureHead.astro';
+import StatusLabel from '../site/StatusLabel.astro';
+import { TL, marks, wearablePath, cameraPaths, stationPath, estimate, estimateAt } from '../../lib/traces';
+import { MAT, makeIso, operator, type Faces } from '../../lib/iso';
+
+const id = 'fig-system';
+const TITLE = 'Operator state: observable, calibrated, actionable';
+const HINT = 'Step through one stretch of work: when does the system hold, and when does it act?';
+
+const TRACE_H = 36;
+const EST_H = 104;
+const camera = cameraPaths(TRACE_H);
+const est = estimate(EST_H);
+const traceBox = `0 0 ${TL.width} ${TRACE_H}`;
+const estBox = `0 0 ${TL.width} ${EST_H}`;
+
+const moments = [
+  { t: 110, name: 'Steady', verdict: 'Watch', text: 'All three signals arrive. The estimate is low and tight, so there is nothing to do.' },
+  { t: 295, name: 'Camera blocked', verdict: 'Hold', text: 'A cart blocks the camera. The estimate turns uncertain, so the system holds.' },
+  { t: 345, name: 'View returns', verdict: 'Hold', text: 'Load looks high, but part of the band is still under the threshold. The system keeps holding.' },
+  { t: TL.act, name: 'Confident', verdict: 'Act', text: 'The whole band has cleared the threshold. Now the system acts: here, the instructions switch to video.' },
+];
+
+// Where the playhead and the point on the estimate sit for each moment.
+const stateCss = moments
+  .map((moment, i) => {
+    const at = estimateAt(moment.t, EST_H);
+    return `.fig-system .xin-a[value="${i + 1}"]:checked ~ .xfig-stage{--t:${((moment.t / TL.width) * 100).toFixed(2)}%;--ey:${((at.y / EST_H) * 100).toFixed(2)}%;--eu:${((at.upper / EST_H) * 100).toFixed(2)}%;--el:${((at.lower / EST_H) * 100).toFixed(2)}%}`;
+  })
+  .join('');
+
+// ---------- the scene: one station, seen in a shallow three-quarter view ----------
+
+const { xy, P, shape, top, front, box, shadow } = makeIso(0.4, 0.32, 300);
+const at = (x: number, y: number, z: number) => {
+  const [sx, sy] = xy(x, y, z);
+  return `cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}"`;
+};
+
+const DIM: Record<string, Faces> = {
+  watch: ['#7f9d90', '#56766a', '#3a5248'],
+  hold: ['#b89f6c', '#917a45', '#6b5a30'],
+  act: ['#ad7257', '#84513a', '#5e3626'],
+};
+const LIT: Record<string, Faces> = {
+  watch: ['#d5f7e6', '#84d6b4', '#4f9f83'],
+  hold: ['#fff0bf', '#f7c95c', '#cc992e'],
+  act: ['#ffd0b5', '#f39263', '#c55f33'],
+};
+const GLOW: Record<string, string> = { watch: '#84d6b4', hold: '#f7c95c', act: '#f39263' };
+const lamp = (z: number, key: string, on: string) =>
+  box(385, 101, z, 16, 16, 11, DIM[key]) +
+  `<g class="sys-lamp" data-a="${on}"><circle class="sys-lamp-glow" ${at(393, 109, z + 5.5)} r="15" fill="${GLOW[key]}"/>${box(385, 101, z, 16, 16, 11, LIT[key])}</g>`;
+
+let scene = '';
+// The floor, and a mat that marks the station.
+scene += box(20, -36, -12, 470, 196, 12, MAT.floor);
+scene += shape(top(186, 30, 0.2, 232, 100), '#8d3514', 'opacity=".09"');
+scene += `<path class="sys-ring" data-a="4" d="M${top(186, 30, 0.3, 232, 100).join('L')}Z"/>`;
+// The camera on its pole, and what it can see.
+scene += shadow(60, 92, 12, 12);
+scene += box(64, 96, 0, 6, 6, 190, MAT.frame);
+scene += box(50, 92, 190, 36, 14, 18, MAT.dark);
+scene += box(86, 95, 194, 9, 8, 10, MAT.green);
+scene += `<circle ${at(95, 99, 199)} r="3.2" fill="#a4dbc5"/>`;
+scene += `<path class="sys-cone" data-a="1 3 4" d="M134.6 69.3L206 110L166 234Z"/>`;
+scene += `<path class="sys-cone" data-a="2" d="M134.6 69.3L176 134L133 124Z"/>`;
+// A loaded cart that rolls between the camera and the operator.
+scene +=
+  `<g class="sys-cart" data-a="2">` +
+  shadow(98, 42, 58, 46, 0.1) +
+  box(102, 46, 0, 9, 6, 6, MAT.dark) +
+  box(145, 46, 0, 9, 6, 6, MAT.dark) +
+  box(100, 44, 6, 56, 44, 104, MAT.cart) +
+  `<path d="M${P(100, 44, 42)}L${P(156, 44, 42)}M${P(100, 44, 76)}L${P(156, 44, 76)}" fill="none" stroke="rgba(22,19,16,.28)" stroke-width="1"/>` +
+  box(104, 48, 110, 22, 34, 34, MAT.copper) +
+  box(130, 48, 110, 22, 34, 26, MAT.green) +
+  `</g>`;
+// The workstation.
+scene += shadow(200, 44, 200, 70);
+scene += box(204, 105, 0, 7, 7, 96, MAT.frame) + box(389, 105, 0, 7, 7, 96, MAT.frame);
+scene += box(204, 48, 0, 7, 7, 96, MAT.frame) + box(389, 48, 0, 7, 7, 96, MAT.frame);
+scene += box(200, 44, 96, 200, 70, 8, MAT.bench);
+scene += box(204, 105, 104, 7, 7, 104, MAT.frame) + box(389, 105, 104, 7, 7, 104, MAT.frame);
+scene += box(204, 105, 208, 192, 7, 7, MAT.frame);
+scene += box(258, 100, 146, 84, 4, 54, MAT.dark);
+scene += shape(front(262, 100, 150, 76, 46), '#f4b58a', '');
+scene +=
+  `<g class="sys-swap" data-a="1 2 3">` +
+  [0, 1, 2, 3].map((k) => shape(front(270, 100, 186 - k * 9, 46 - k * 9, 3.2), '#17130f', 'opacity=".6"')).join('') +
+  `</g>`;
+scene +=
+  `<g class="sys-swap" data-a="4">` +
+  `<path d="M${P(290, 100, 164)}L${P(290, 100, 188)}L${P(312, 100, 176)}Z" fill="#17130f"/>` +
+  shape(front(270, 100, 154, 60, 3), '#17130f', 'opacity=".35"') +
+  `<path class="sys-progress xlive" d="M${front(270, 100, 154, 60, 3).join('L')}Z" fill="#8d3514"/>` +
+  `</g>`;
+scene += box(214, 92, 104, 30, 14, 14, MAT.copper) + box(248, 92, 104, 30, 14, 14, MAT.green);
+scene += box(236, 54, 104, 74, 32, 3, MAT.steel);
+scene += box(242, 60, 107, 16, 16, 12, MAT.part) + box(262, 60, 107, 16, 16, 18, MAT.part) + box(284, 62, 107, 14, 14, 9, MAT.green);
+scene += box(368, 47, 104, 16, 10, 5, MAT.dark) + `<circle ${at(376, 47, 106.5)} r="2.2" fill="#fdf3e3"/>`;
+// The signal light on the station frame.
+scene += box(391, 107, 215, 4, 4, 12, MAT.frame);
+scene += lamp(227, 'act', '4') + lamp(240, 'hold', '2 3') + lamp(253, 'watch', '1');
+// Three signals run along the floor to a junction, and on to the panel.
+scene += `<path class="sys-wire is-mint xlive" d="M${P(67, 92, 0)}L${P(67, -26, 0)}L${P(438, -26, 0)}"/>`;
+scene += `<path class="sys-wire is-glow xlive" d="M${P(176, 26, 0)}L${P(176, -18, 0)}L${P(438, -18, 0)}"/>`;
+scene += `<path class="sys-wire is-paper xlive" d="M${P(392, 46, 0)}L${P(392, -10, 0)}L${P(438, -10, 0)}"/>`;
+scene += box(436, -32, 0, 26, 28, 12, MAT.dark);
+scene += `<circle ${at(446, -26, 12.4)} r="1.9" fill="#a4dbc5"/><circle ${at(449, -18, 12.4)} r="1.9" fill="#f4b58a"/><circle ${at(452, -10, 12.4)} r="1.9" fill="#fdf3e3"/>`;
+const [jx, jy] = xy(462, -18, 5);
+scene += `<path d="M${jx.toFixed(1)} ${jy.toFixed(1)}C${(jx + 40).toFixed(1)} ${(jy + 1).toFixed(1)} 524 296 566 295" fill="none" stroke="#17130f" stroke-width="3.2" stroke-linecap="round"/>`;
+// The operator, in front of everything.
+const [ox, oy] = xy(170, 34, 0);
+scene += operator(ox, oy, 1.24, { live: true });
+---
+
+<XFigure id={id} no={1} title={TITLE} hint={HINT} headless>
+  {
+    moments.map((_, i) => (
+      <input class="xin xin-a" type="radio" name={`${id}-a`} id={`${id}-a${i + 1}`} value={i + 1} checked={i === 0} />
+    ))
+  }
+  <style is:inline set:html={stateCss}></style>
+
+  <div class="sys-top">
+    <div class="sys-heading">
+      <XFigureHead id={id} no={1} title={TITLE} hint={HINT} />
+    </div>
+    <div class="xsteps sys-steps" style="--n:4">
+      {
+        moments.map((moment, i) => (
+          <label
+            class:list={['xstep', i === 1 && 'xnudge']}
+            for={`${id}-a${i + 1}`}
+            data-pick-a={i + 1}
+            data-a={moments.map((_, k) => k + 1).filter((k) => k >= i + 1).join(' ')}
+          >
+            <span class="xstep-no">{i + 1}</span>
+            <span class="xstep-name">{moment.name}</span>
+          </label>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="xfig-stage sys">
+    <div class="sys-station">
+      <p class="sys-station-tab">
+        <svg viewBox="0 0 12 14" aria-hidden="true" focusable="false">
+          <path d="M3 6V4.2a3 3 0 016 0V6M2 6h8v6.5H2z"></path>
+        </svg>
+        <span><b>At the station.</b> Raw video and biosignals stay here.</span>
+        <StatusLabel status="direction" compact />
+      </p>
+
+      <div class="sys-scene" aria-hidden="true">
+        <svg viewBox="0 0 560 332" focusable="false">
+          <Fragment set:html={scene} />
+        </svg>
+        <span class="xpanes sys-andon">
+          <b class="xpane is-watch" data-a="1">Watch</b>
+          <b class="xpane is-hold" data-a="2 3">Hold</b>
+          <b class="xpane is-act" data-a="4">Act</b>
+        </span>
+      </div>
+
+      <div class="xscreen sys-panel">
+        <div class="sys-plot">
+          <span class="sys-block" style={`left:${marks.occlusionLeft};width:${marks.occlusionWidth}`} aria-hidden="true">
+            <span>camera blocked</span>
+          </span>
+          <span class="sys-head" aria-hidden="true"></span>
+
+          <p class="sys-stage"><span>01</span>Observe</p>
+
+          <div class="sys-row">
+            <p class="sys-ch"><span class="sys-led is-glow"></span>Wearable physiology</p>
+            <span class="sys-status"><StatusLabel status="published" compact /></span>
+            <svg class="sys-trace is-glow" viewBox={traceBox} preserveAspectRatio="none" aria-hidden="true" focusable="false">
+              <path d={wearablePath(TRACE_H)}></path>
+            </svg>
+          </div>
+          <div class="sys-row">
+            <p class="sys-ch"><span class="sys-led is-mint"></span>Camera vision</p>
+            <span class="sys-status"><StatusLabel status="published" compact /></span>
+            <svg class="sys-trace is-mint" viewBox={traceBox} preserveAspectRatio="none" aria-hidden="true" focusable="false">
+              <path d={camera.before}></path>
+              <path d={camera.after}></path>
+            </svg>
+          </div>
+          <div class="sys-row">
+            <p class="sys-ch"><span class="sys-led is-paper"></span>Station telemetry</p>
+            <span class="sys-status"><StatusLabel status="published" compact /></span>
+            <svg class="sys-trace is-paper" viewBox={traceBox} preserveAspectRatio="none" aria-hidden="true" focusable="false">
+              <path d={stationPath(TRACE_H)}></path>
+            </svg>
+          </div>
+
+          <p class="sys-stage"><span>02</span>Calibrate</p>
+
+          <div class="sys-row">
+            <p class="sys-ch">Estimated cognitive load, with its uncertainty</p>
+            <span class="sys-status"><StatusLabel status="ongoing" compact /></span>
+            <div class="sys-est">
+              <svg viewBox={estBox} preserveAspectRatio="none" aria-hidden="true" focusable="false">
+                <path class="sys-band" d={est.band}></path>
+                <path class="sys-threshold" d={`M0 ${est.thresholdY} H${TL.width}`}></path>
+                <path class="sys-line" d={est.line}></path>
+              </svg>
+              <span class="sys-threshold-label" style={`top:${est.thresholdTop}`} aria-hidden="true">threshold</span>
+              <span class="sys-span" aria-hidden="true"></span>
+              <span class="sys-dot" aria-hidden="true"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="sys-leave"><span aria-hidden="true">↓</span> Only de-identified indicators leave the station</p>
+
+    <div class="sys-out">
+      <div class="sys-readout">
+        <div class="xpanes sys-verdicts" aria-live="polite">
+          {
+            moments.map((moment, i) => (
+              <div class:list={['xpane', 'sys-verdict', `is-${moment.verdict.toLowerCase()}`]} data-a={i + 1}>
+                <p class="sys-word">{moment.verdict}</p>
+                <p>{moment.text}</p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      <div class="sys-act" data-a="4">
+        <p class="sys-model">
+          <span class="sys-stage is-light"><span>03</span>Act</span>
+          <StatusLabel status="ongoing" compact />
+          <span>A state-space production model carries the estimate from one station to the whole line.</span>
+        </p>
+        <ul class="sys-levers">
+          <li><StatusLabel status="published" compact /><span>Instruction format</span></li>
+          <li><StatusLabel status="ongoing" compact /><span>Adaptive work instructions</span></li>
+          <li><StatusLabel status="direction" compact /><span>Human-robot task allocation</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <Fragment slot="caption">
+    <span>How my research program fits together. The scene and the traces are illustrations, not study data.</span>
+    <span class="key">
+      <StatusLabel status="published" />
+      <StatusLabel status="ongoing" />
+      <StatusLabel status="direction" />
+    </span>
+  </Fragment>
+</XFigure>

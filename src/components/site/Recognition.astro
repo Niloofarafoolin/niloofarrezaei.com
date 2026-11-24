@@ -1,0 +1,211 @@
+---
+/**
+ * The awards, told with photographs (home page).
+ *
+ * The first award is told as a short story in four photos. The others follow as cards that run
+ * across the page, with the photo changing side from one card to the next.
+ * Captions name only the owner. Each photo must have a row in MEDIA-RIGHTS.md.
+ */
+import { Image } from 'astro:assets';
+import { photos, type SitePhoto } from '../../data/photos';
+import { recognition, type Recognition } from '../../data/program';
+import '../../styles/recognition.css';
+
+const award = (key: Recognition['key']) => recognition.find((item) => item.key === key)!;
+const blueSky = award('blue-sky');
+const essay = award('essay');
+const iaap = award('iaap');
+const reviewer = award('reviewer');
+
+type Scene = { photo: SitePhoto; title: string; shape: string; widths: number[]; sizes: string };
+
+const story: Scene[] = [
+  {
+    photo: photos.blueSkyTalk,
+    title: 'The talk',
+    shape: 'is-tall is-talk',
+    widths: [320, 480, 720, 1051],
+    sizes: '(min-width: 52rem) 19rem, 46vw',
+  },
+  {
+    photo: photos.blueSkyAnnouncement,
+    title: 'The announcement',
+    shape: 'is-strip is-first',
+    widths: [480, 720, 960, 1440, 1800],
+    sizes: '(min-width: 52rem) 29rem, 92vw',
+  },
+  {
+    photo: photos.blueSkyTeam,
+    title: 'The team',
+    shape: 'is-strip is-second',
+    widths: [480, 720, 960, 1280, 1600],
+    sizes: '(min-width: 52rem) 29rem, 92vw',
+  },
+  {
+    photo: photos.dornfeldGala,
+    title: 'The award',
+    shape: 'is-tall is-gala',
+    widths: [480, 720, 960, 1280, 1700],
+    // This tile is taller than its photo, so the photo is scaled up to fill it. Ask for a wider file than the tile.
+    sizes: '(min-width: 52rem) 29rem, 58vw',
+  },
+];
+const no = (i: number) => String(i + 1).padStart(2, '0');
+/** The legend under the photos has three columns, like the photos: 01, then 02 and 03, then 04. */
+const legend = [[0], [1, 2], [3]];
+const credited = story.flatMap((item, i) => (item.photo.credit ? [no(i)] : []));
+---
+
+<section class="band is-dark recog" id="recognition" aria-labelledby="recognition-heading">
+  <div class="wrap">
+    <header class="recog-head">
+      <p class="section-label">Recognition</p>
+      <h2 class="recog-title" id="recognition-heading">
+        Two competition wins, a scholarship <em>and a reviewer award</em>
+      </h2>
+    </header>
+
+    <article class="recog-feature" aria-labelledby="recog-blue-sky">
+      <header class="recog-feature-head">
+        <div>
+          <p class="recog-kicker"><span>{blueSky.year}</span>{blueSky.kind}</p>
+          <h3 class="recog-name is-large" id="recog-blue-sky">{blueSky.name}</h3>
+        </div>
+        <div class="recog-about">
+          <p>{blueSky.detail}</p>
+          {
+            blueSky.links && (
+              <p class="proof-links">
+                {blueSky.links.map((link) => (
+                  <a href={link.href} rel="noopener">
+                    {link.label}
+                  </a>
+                ))}
+              </p>
+            )
+          }
+        </div>
+      </header>
+
+      <div class="recog-story">
+        {
+          story.map((item, i) => (
+            <figure class:list={['recog-tile', item.shape]} aria-describedby={`recog-cap-${i + 1}`}>
+              <Image src={item.photo.src} alt={item.photo.alt} widths={item.widths} sizes={item.sizes} loading="lazy" />
+              <span class="recog-no" aria-hidden="true">
+                {no(i)}
+              </span>
+            </figure>
+          ))
+        }
+      </div>
+
+      <div class="recog-legend">
+        {
+          legend.map((group) => (
+            <div>
+              {group.map((i) => (
+                <p id={`recog-cap-${i + 1}`}>
+                  <b aria-hidden="true">{no(i)}</b>
+                  <span>
+                    <strong>{story[i].title}</strong>
+                    <i>{story[i].photo.when}</i>
+                    <span>{story[i].photo.caption}</span>
+                  </span>
+                </p>
+              ))}
+            </div>
+          ))
+        }
+      </div>
+      <p class="recog-credit">Photos {credited.slice(0, -1).join(', ')} and {credited[credited.length - 1]} © Jason Loudermilk Photography.</p>
+    </article>
+
+    <div class="recog-more">
+      <article class="recog-card is-essay" aria-labelledby="recog-essay">
+        <div class="recog-media">
+          <figure class="recog-tile is-group">
+            <Image
+              src={photos.essayGroup.src}
+              alt={photos.essayGroup.alt}
+              widths={[480, 720, 960, 1440, 2000]}
+              sizes="(min-width: 60rem) 44rem, 92vw"
+              loading="lazy"
+            />
+          </figure>
+          <figure class="recog-clip">
+            <Image
+              src={photos.essaySlide.src}
+              alt={photos.essaySlide.alt}
+              widths={[720, 1080, 1438]}
+              sizes="(min-width: 60rem) 40rem, 150vw"
+              loading="lazy"
+            />
+          </figure>
+        </div>
+        <div class="recog-body">
+          <p class="recog-kicker"><span>{essay.year}</span>{essay.kind}</p>
+          <h3 class="recog-name" id="recog-essay">{essay.name}</h3>
+          <p>{essay.detail}</p>
+          <p class="recog-capline">
+            {photos.essayGroup.caption} Over it, the line that lists my essay on the competition slide.
+          </p>
+          {
+            essay.links && (
+              <p class="proof-links">
+                {essay.links.map((link) => (
+                  <a href={link.href} rel="noopener">
+                    {link.label}
+                  </a>
+                ))}
+              </p>
+            )
+          }
+        </div>
+      </article>
+
+      <article class="recog-card is-reviewer" aria-labelledby="recog-reviewer">
+        <figure class="recog-tile is-lineup">
+          <Image
+            src={photos.reviewerAward.src}
+            alt={photos.reviewerAward.alt}
+            widths={[480, 720, 960, 1280]}
+            sizes="(min-width: 60rem) 44rem, 92vw"
+            loading="lazy"
+          />
+        </figure>
+        <div class="recog-body">
+          <p class="recog-count" aria-hidden="true">
+            <span>1</span><i>of</i><span>4</span>
+          </p>
+          <p class="recog-kicker"><span>{reviewer.year}</span>{reviewer.kind}</p>
+          <h3 class="recog-name" id="recog-reviewer">{reviewer.name}</h3>
+          <p>{reviewer.detail}</p>
+          <p class="recog-capline">{photos.reviewerAward.caption} {photos.reviewerAward.credit}.</p>
+        </div>
+      </article>
+
+      <article class="recog-card is-iaap" aria-labelledby="recog-iaap">
+        <figure class="recog-tile is-screen">
+          <Image
+            src={photos.iaapAnnouncement.src}
+            alt={photos.iaapAnnouncement.alt}
+            widths={[480, 638]}
+            sizes="(min-width: 44rem) 30rem, 92vw"
+            loading="lazy"
+          />
+        </figure>
+        <div class="recog-body is-split">
+          <div>
+            <p class="recog-kicker"><span>{iaap.year}</span>{iaap.kind}</p>
+            <h3 class="recog-name" id="recog-iaap">{iaap.name}</h3>
+          </div>
+          <div>
+            <p>{iaap.detail}</p>
+            <p class="recog-capline">{photos.iaapAnnouncement.caption}</p>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
